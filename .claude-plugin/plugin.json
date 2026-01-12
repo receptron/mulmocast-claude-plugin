@@ -1,0 +1,11 @@
+{
+  "name": "mulmocast-claude-plugin",
+  "version": "0.1.0",
+  "description": "Analyze repositories and generate MulmoScript for video/PDF creation",
+  "author": {
+    "name": "isamu"
+  },
+  "repository": "https://github.com/receptron/mulmocast-claude-plugin",
+  "license": "MIT",
+  "keywords": ["mulmocast", "video", "pdf", "presentation", "ai"]
+}
