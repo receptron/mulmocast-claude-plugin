@@ -1,0 +1,81 @@
+{
+  "$mulmocast": {
+    "version": "1.1",
+    "credit": "closing"
+  },
+  "title": "Example Project - Overview",
+  "description": "A standard overview of Example Project",
+  "lang": "en",
+  "beats": [
+    {
+      "text": "Welcome to Example Project, a tool that helps you accomplish important tasks quickly and efficiently.",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "Example Project",
+          "subtitle": "Making complex tasks simple"
+        }
+      }
+    },
+    {
+      "text": "Modern workflows often require multiple tools and manual processes. Example Project streamlines this by providing a unified solution.",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "The Challenge",
+          "bullets": [
+            "Multiple disconnected tools",
+            "Manual repetitive tasks",
+            "Time-consuming workflows"
+          ]
+        }
+      }
+    },
+    {
+      "text": "The architecture is built around a simple input-process-output flow. Your data goes in, gets transformed, and produces the desired result.",
+      "image": {
+        "type": "mermaid",
+        "title": "Architecture Overview",
+        "code": {
+          "kind": "text",
+          "text": "graph LR\n    A[Input] --> B[Process]\n    B --> C[Transform]\n    C --> D[Output]"
+        }
+      }
+    },
+    {
+      "text": "Key features include automatic processing, flexible configuration, and extensible design that adapts to your needs.",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "Key Features",
+          "bullets": [
+            "Automatic processing",
+            "Flexible configuration",
+            "Extensible design"
+          ]
+        }
+      }
+    },
+    {
+      "text": "Getting started is simple. Install the package, create a configuration file, and run the command.",
+      "image": {
+        "type": "markdown",
+        "markdown": "# Quick Start\n\n```bash\nnpm install example-project\nexample-project run config.json\n```"
+      }
+    },
+    {
+      "text": "In summary, Example Project simplifies your workflow, saves time, and produces consistent results. Try it today.",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "Summary",
+          "bullets": [
+            "Simplified workflow",
+            "Time savings",
+            "Consistent results"
+          ]
+        }
+      }
+    }
+  ]
+}

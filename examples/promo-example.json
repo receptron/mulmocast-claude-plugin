@@ -1,0 +1,103 @@
+{
+  "$mulmocast": {
+    "version": "1.1",
+    "credit": "closing"
+  },
+  "title": "Example Project - Your Time Matters",
+  "description": "A WHY-first promotional video showcasing Example Project",
+  "lang": "en",
+  "beats": [
+    {
+      "text": "You have goals. Important goals. Goals that could grow your business. Goals that could help your team. Goals that could change how you work.",
+      "imagePrompt": "A person looking at a vision board with dreams and aspirations, warm golden morning light streaming through window, hope and determination, cinematic"
+    },
+    {
+      "text": "But those goals keep slipping away. Buried under repetitive tasks. Lost in manual processes. Sacrificed because there's never enough time.",
+      "imagePrompt": "An hourglass with sand running out, person in background looking stressed at cluttered desk, blue melancholic lighting, sense of urgency"
+    },
+    {
+      "text": "Think about it. How many hours did you spend this week on tasks that could have been automated? How many projects got delayed because the tools were too complex?",
+      "imagePrompt": "A maze made of tangled cables and sticky notes, person trying to find their way through, overhead view, frustration and complexity"
+    },
+    {
+      "text": "Your time is valuable. Every minute spent on repetitive work is a minute not spent on what matters. And that's a loss you can't afford.",
+      "imagePrompt": "A clock face dissolving into dust, each particle representing lost opportunities, dramatic lighting, artistic photography"
+    },
+    {
+      "text": "What if it didn't have to be this way? What if the work that takes hours could take seconds?",
+      "imagePrompt": "A bright door opening in a dark room, light streaming through, silhouette of person about to step through, hope and possibility"
+    },
+    {
+      "text": "Imagine starting your day and having your routine tasks already done. Imagine having time for strategy instead of busywork. Imagine actually leaving the office on time.",
+      "imagePrompt": "A happy professional leaving an office building at sunset, colleagues waving goodbye, work-life balance, warm optimistic atmosphere"
+    },
+    {
+      "text": "This is why we built Example Project.",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "This is why",
+          "subtitle": "we built Example Project"
+        }
+      }
+    },
+    {
+      "text": "Example Project automates the tedious. It handles the repetitive. It does in seconds what used to take hours. So you can focus on what actually matters.",
+      "imagePrompt": "A symphony of robotic arms working in harmony, each handling a different task, human conductor overseeing with confidence, futuristic but warm"
+    },
+    {
+      "text": "Let me show you. What used to require five different tools? One command. What used to need a team? Just you. What used to take a week? Done before lunch.",
+      "image": {
+        "type": "chart",
+        "title": "Time to Complete",
+        "chartData": {
+          "type": "bar",
+          "data": {
+            "labels": ["Before", "After"],
+            "datasets": [{
+              "label": "Hours",
+              "data": [40, 2],
+              "backgroundColor": ["#6b7280", "#10b981"]
+            }]
+          }
+        }
+      }
+    },
+    {
+      "text": "And because your work evolves, Example Project adapts. Configure it once. Extend it as needed. It grows with you.",
+      "imagePrompt": "A tree growing through seasons in timelapse style, each branch representing new capabilities, organic growth, life and adaptation"
+    },
+    {
+      "text": "Your team is waiting to work smarter. Your clients are waiting for faster delivery. Your future self is waiting to thank you.",
+      "imagePrompt": "A diverse team celebrating around a conference table, project completed early, genuine happiness and relief, warm office lighting"
+    },
+    {
+      "text": "The only question is: What will you do with the time you get back?",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "What will you do",
+          "subtitle": "with the time you get back?"
+        }
+      }
+    },
+    {
+      "text": "Example Project. Because your time matters.",
+      "image": {
+        "type": "textSlide",
+        "slide": {
+          "title": "Example Project",
+          "subtitle": "Your time matters."
+        }
+      }
+    },
+    {
+      "text": "Start today. You'll wonder why you waited.",
+      "imagePrompt": "A confident person taking the first step on a bright path, sunrise ahead, leaving complexity behind, empowerment and new beginnings"
+    },
+    {
+      "text": "Thank you.",
+      "imagePrompt": "A simple stage with warm spotlight, curtain call atmosphere, gratitude and elegance, professional theater setting"
+    }
+  ]
+}

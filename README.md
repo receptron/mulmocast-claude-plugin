@@ -1,11 +1,17 @@
 # MulmoCast Claude Plugin
 
-Claude Code plugin that analyzes repositories and automatically generates MulmoScript for video and PDF creation.
+Claude Code plugin that analyzes various content sources and automatically generates MulmoScript for video and PDF creation.
+
+## Supported Input Types
+
+- **Repositories** - Source code projects, documentation, etc.
+- **PDF Documents** - Research papers, reports, white papers, manuals
+- **PowerPoint Presentations** - PPTX/PPT slide decks
 
 ## Features
 
-- Automatically analyzes repository structure and content
-- Determines repository purpose (source code, business docs, presentations)
+- Automatically analyzes content structure and purpose
+- **Language detection**: Output language matches source material (Japanese → Japanese, English → English)
 - Generates THREE MulmoScript versions:
   - **Standard version**: 8-12 beats, high-level overview
   - **Detailed version**: 20-30+ beats, comprehensive technical deep-dive
@@ -45,24 +51,54 @@ claude --add-plugin /path/to/mulmocast-claude-plugin
 
 ## Usage
 
-In any repository:
+### Repository Analysis
 
 ```
 /mulmocast:generate
 ```
 
-This will:
-1. Analyze the repository structure
-2. Generate three MulmoScripts:
-   - `<repo-name>.json` (standard)
-   - `<repo-name>_detail.json` (detailed)
-   - `<repo-name>_promo.json` (promotional)
-3. Create video and PDF outputs for all versions
+Analyzes the current repository and generates three MulmoScripts.
+
+### PDF Document Analysis
+
+```
+/mulmocast:pdf-to-video <pdf-file>
+```
+
+Example:
+```
+/mulmocast:pdf-to-video research-paper.pdf
+/mulmocast:pdf-to-video docs/annual-report.pdf
+```
+
+### PowerPoint Analysis
+
+```
+/mulmocast:ppt-to-video <ppt-file>
+```
+
+Example:
+```
+/mulmocast:ppt-to-video presentation.pptx
+/mulmocast:ppt-to-video slides/keynote.pptx
+```
+
+### Output
+
+Each command generates:
+1. Three MulmoScripts (standard, detailed, promotional)
+2. Video and PDF outputs for all versions
 
 ## Components
 
-- **Command**: `/mulmocast:generate` - Main workflow trigger
-- **Agent**: `repo-analyzer` - Repository analysis and script generation
+- **Commands**:
+  - `/mulmocast:generate` - Repository analysis
+  - `/mulmocast:pdf-to-video` - PDF document analysis
+  - `/mulmocast:ppt-to-video` - PowerPoint analysis
+- **Agents**:
+  - `repo-analyzer` - Repository analysis and script generation
+  - `pdf-analyzer` - PDF document analysis and script generation
+  - `ppt-analyzer` - PowerPoint analysis and script generation
 - **Skill**: `mulmocast-scripting` - MulmoScript best practices and schema validation
 
 ## Output
