@@ -39,7 +39,7 @@ claude --plugin-dir /path/to/mulmocast-claude-plugin
 
 ### Required
 
-- **Node.js** 18+
+- **Node.js** 22+
 - **ffmpeg** — for video/audio assembly
   ```bash
   brew install ffmpeg   # macOS
