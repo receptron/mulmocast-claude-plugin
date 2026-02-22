@@ -1,0 +1,22 @@
+{
+  "name": "mulmocast-plugins",
+  "owner": {
+    "name": "receptron"
+  },
+  "metadata": {
+    "description": "MulmoCast skills for Claude Code",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "mulmocast",
+      "source": ".",
+      "description": "Create high-quality video presentations from URLs, topics, and documents",
+      "version": "1.0.0",
+      "author": { "name": "receptron" },
+      "category": "productivity",
+      "license": "MIT",
+      "keywords": ["mulmocast", "video", "presentation", "slide"]
+    }
+  ]
+}
