@@ -10,7 +10,10 @@
   "plugins": [
     {
       "name": "mulmocast",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "receptron/mulmocast-claude-plugin"
+      },
       "description": "Create high-quality video presentations from URLs, topics, and documents",
       "version": "1.0.0",
       "author": { "name": "receptron" },
