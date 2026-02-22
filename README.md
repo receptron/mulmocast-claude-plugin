@@ -37,8 +37,27 @@ claude --plugin-dir /path/to/mulmocast-claude-plugin
 
 ## Prerequisites
 
-- [MulmoCast CLI](https://github.com/receptron/mulmocast-cli) installed in the project (`npm install mulmocast` or `yarn add mulmocast`)
-- API keys configured (see [MulmoCast setup](https://github.com/receptron/mulmocast-cli#configuration))
+### Required
+
+- **Node.js** 18+
+- **ffmpeg** — for video/audio assembly
+  ```bash
+  brew install ffmpeg   # macOS
+  ```
+- **OPENAI_API_KEY** — for text-to-speech (default TTS provider)
+
+### Optional (for additional features)
+
+| Env variable | Purpose |
+|---|---|
+| `GEMINI_API_KEY` | Google Gemini image generation & TTS |
+| `REPLICATE_API_TOKEN` | Replicate video generation |
+| `ELEVENLABS_API_KEY` | ElevenLabs TTS |
+| `BROWSERLESS_API_TOKEN` | Web access in scripting tools |
+
+Set these in a `.env` file in your project root.
+
+See [MulmoCast CLI setup](https://github.com/receptron/mulmocast-cli#configuration) for full details.
 
 ## License
 
