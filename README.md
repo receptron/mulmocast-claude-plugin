@@ -53,7 +53,6 @@ claude --plugin-dir /path/to/mulmocast-claude-plugin
 | `GEMINI_API_KEY` | Google Gemini image generation & TTS |
 | `REPLICATE_API_TOKEN` | Replicate video generation |
 | `ELEVENLABS_API_KEY` | ElevenLabs TTS |
-| `BROWSERLESS_API_TOKEN` | Web access in scripting tools |
 
 Set these in a `.env` file in your project root.
 
