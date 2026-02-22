@@ -23,13 +23,19 @@ Create high-quality MulmoScript (video presentations) through a structured multi
 
 ## Installation
 
-### From marketplace
+### Step 1: Add marketplace
 
-```
-/plugin install mulmocast@receptron/mulmocast-claude-plugin
+```bash
+claude plugin marketplace add receptron/mulmocast-claude-plugin
 ```
 
-### Local development
+### Step 2: Install plugin
+
+```bash
+claude plugin install mulmocast@mulmocast-plugins
+```
+
+### Local development (alternative)
 
 ```bash
 claude --plugin-dir /path/to/mulmocast-claude-plugin
