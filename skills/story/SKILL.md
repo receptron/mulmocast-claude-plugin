@@ -254,10 +254,10 @@ For beats showing statistics or research findings, add `"reference": "Source: ..
 
 ### Write the file and present output
 
-Generate the movie directly — `yarn movie` automatically generates images and audio as well, so separate `yarn images` / `yarn audio` steps are unnecessary.
+Generate the movie directly — `npx mulmocast@latest movie` automatically generates images and audio as well, so separate image/audio steps are unnecessary.
 
 ```bash
-yarn movie <filename>
+npx mulmocast@latest movie <filename>
 ```
 
 ```text

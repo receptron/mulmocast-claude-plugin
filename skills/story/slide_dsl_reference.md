@@ -103,7 +103,7 @@ Pre-built presentation style files are available in `assets/styles/slide_*.json`
 
 Apply via `-s` option:
 ```bash
-yarn cli tool complete beats.json -s slide_dark -o presentation.json
+npx mulmocast@latest tool complete beats.json -s slide_dark -o presentation.json
 ```
 
 ## Layouts (11 types)
