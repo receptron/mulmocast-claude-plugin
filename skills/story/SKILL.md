@@ -182,9 +182,9 @@ Then inside bullets: `"Key point about {danger:critical risk} and normal context
 
 ### DSL reference and patterns
 
-For layout/block specifications, **Read** `slide_dsl_reference.md` in this skill directory.
+For layout/block specifications, **Read** `references/slide_dsl_reference.md` at the plugin root.
 
-For design pattern examples (dense slides, charts, mermaid), **Read** `slide_patterns.md` in this skill directory.
+For design pattern examples (dense slides, charts, mermaid), **Read** `references/slide_patterns.md` at the plugin root.
 
 ### Image embedding
 
