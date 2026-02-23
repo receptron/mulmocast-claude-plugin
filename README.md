@@ -4,9 +4,21 @@
 
 ## Skills
 
+### `/mulmocast:mulmocast` (dispatcher)
+
+Unified entry point that automatically detects input type and routes to the appropriate skill.
+
+```
+/mulmocast:mulmocast https://example.com/article    → routes to story
+/mulmocast:mulmocast samples/presentation.pdf       → routes to narrate
+/mulmocast:mulmocast samples/document.md            → routes to narrate
+/mulmocast:mulmocast scripts/talk/talk.json         → routes to extend
+/mulmocast:mulmocast AI trends in 2026              → routes to story
+```
+
 ### `/mulmocast:story`
 
-Create high-quality MulmoScript (video presentations) through a structured multi-phase creative process:
+Create high-quality MulmoScript (video presentations) from scratch through a structured multi-phase creative process:
 
 1. **Research** — Fetch URLs, search topics, collect visual assets
 2. **Structure** — Design beat outline with appropriate scale
@@ -19,6 +31,30 @@ Create high-quality MulmoScript (video presentations) through a structured multi
 /mulmocast:story https://example.com/article 日本語でmovie
 /mulmocast:story AI trends in 2026, 5 slides, English
 /mulmocast:story path/to/document.pdf
+```
+
+### `/mulmocast:narrate`
+
+Convert source files (PDF, PPTX, Markdown, Keynote) into narrated ExtendedMulmoScript with AI-generated narration and metadata.
+
+- **Markdown files**: Uses `parse-md` → presentation plan → `assemble-extended` pipeline with intelligent beat allocation and variant support (detailed/short profiles)
+- **PDF/PPTX/Keynote**: Uses `narrate --scaffold-only` → AI analysis → metadata generation
+
+**Usage:**
+```
+/mulmocast:narrate samples/paper.pdf
+/mulmocast:narrate samples/slides.pptx
+/mulmocast:narrate samples/document.md
+```
+
+### `/mulmocast:extend`
+
+Add metadata to an existing MulmoScript to create an ExtendedMulmoScript. The metadata enables AI features (summarize, query) via `mulmocast-preprocessor`.
+
+**Usage:**
+```
+/mulmocast:extend scripts/my-talk/my-talk.json
+/mulmocast:extend scripts/my-talk/my-talk.json --source samples/my-talk.pdf
 ```
 
 ## Installation
@@ -51,6 +87,8 @@ claude --plugin-dir /path/to/mulmocast-claude-plugin
   brew install ffmpeg   # macOS
   ```
 - **OPENAI_API_KEY** — for text-to-speech (default TTS provider)
+- **npx @mulmocast/slide** — for source file conversion (`narrate`, `extend` skills)
+- **npx mulmocast-preprocessor** — for ExtendedMulmoScript processing
 
 ### Optional (for additional features)
 

@@ -1,7 +1,7 @@
 {
   "name": "mulmocast",
-  "description": "MulmoCast skills for Claude Code — create high-quality video presentations from URLs, topics, and documents",
-  "version": "1.0.0",
+  "description": "MulmoCast skills for Claude Code — create, narrate, and extend video presentations from any input",
+  "version": "2.0.0",
   "author": {
     "name": "receptron",
     "url": "https://github.com/receptron"
