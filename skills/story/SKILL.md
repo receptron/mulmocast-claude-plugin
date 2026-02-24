@@ -132,7 +132,7 @@ When user asks for condensed/few slides, aim for 3-5 dense beats.
 
 ### Theme selection
 
-Read the theme JSON from `assets/slide_themes/{theme}.json` and embed in `slideParams.theme`.
+Run `npx mulmocast@latest tool info themes --format json` to get all theme definitions, then embed the chosen theme object in `slideParams.theme`.
 
 ### Color scheme discipline
 

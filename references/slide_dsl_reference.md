@@ -67,43 +67,33 @@ Values are 6-digit hex without `#`. Example: `"3B82F6"`
 
 ### Preset Themes (6 variants)
 
-Theme JSON files are stored in `assets/slide_themes/`. Read the appropriate file and set its content as `slideParams.theme`.
+Retrieve theme definitions via CLI and set the chosen theme as `slideParams.theme`:
 
-| File | Name | Style | Best for |
-|------|------|-------|----------|
-| `assets/slide_themes/dark.json` | dark | Dark Professional | Tech talks, developer presentations |
-| `assets/slide_themes/pop.json` | pop | Bright and Energetic | Marketing, product launches |
-| `assets/slide_themes/warm.json` | warm | Warm and Welcoming | Education, workshops |
-| `assets/slide_themes/creative.json` | creative | Bold and Modern | Design reviews, startup pitches |
-| `assets/slide_themes/minimal.json` | minimal | Clean and Fresh | Academic, research |
-| `assets/slide_themes/corporate.json` | corporate | Professional | Business reports, formal meetings |
+```bash
+# List available themes
+npx mulmocast@latest tool info themes
 
-Read the theme JSON file and embed it in `slideParams.theme`:
+# Get full theme JSON (for embedding in slideParams.theme)
+npx mulmocast@latest tool info themes --format json
+```
+
+| Name | Style | Best for |
+|------|-------|----------|
+| dark | Dark Professional | Tech talks, developer presentations |
+| pop | Bright and Energetic | Marketing, product launches |
+| warm | Warm and Welcoming | Education, workshops |
+| creative | Bold and Modern | Design reviews, startup pitches |
+| minimal | Clean and Fresh | Academic, research |
+| corporate | Professional | Business reports, formal meetings |
+
+Extract the chosen theme from the JSON output and embed it in `slideParams.theme`:
 
 ```json
 {
   "slideParams": {
-    "theme": { /* contents of assets/slide_themes/dark.json */ }
+    "theme": { /* theme object from "npx mulmocast@latest tool info themes --format json" */ }
   }
 }
-```
-
-#### Using a presentation style (recommended)
-
-Pre-built presentation style files are available in `assets/styles/slide_*.json`. These include `$mulmocast`, `slideParams.theme`, and `canvasSize` (1280x720).
-
-| Style file | Theme |
-|-----------|-------|
-| `assets/styles/slide_dark.json` | dark |
-| `assets/styles/slide_pop.json` | pop |
-| `assets/styles/slide_warm.json` | warm |
-| `assets/styles/slide_creative.json` | creative |
-| `assets/styles/slide_minimal.json` | minimal |
-| `assets/styles/slide_corporate.json` | corporate |
-
-Apply via `-s` option:
-```bash
-npx mulmocast@latest tool complete beats.json -s slide_dark -o presentation.json
 ```
 
 ## Layouts (11 types)
