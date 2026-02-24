@@ -14,6 +14,8 @@ Unified entry point that automatically detects input type and routes to the appr
 /mulmocast:mulmocast samples/document.md            → routes to narrate
 /mulmocast:mulmocast scripts/talk/talk.json         → routes to extend
 /mulmocast:mulmocast AI trends in 2026              → routes to story
+/mulmocast:mulmocast https://example.com illustrate → routes to illustrate
+/mulmocast:mulmocast AI trends, illustrated         → routes to illustrate
 ```
 
 ### `/mulmocast:story`
@@ -31,6 +33,23 @@ Create high-quality MulmoScript (video presentations) from scratch through a str
 /mulmocast:story https://example.com/article 日本語でmovie
 /mulmocast:story AI trends in 2026, 5 slides, English
 /mulmocast:story path/to/document.pdf
+```
+
+### `/mulmocast:illustrate`
+
+Create MulmoScript presentations where every visual is an AI-generated image via `imagePrompt`. Uses a structured 5-phase process:
+
+1. **Research** — Fetch URLs, search topics, gather information
+2. **Structure** — Design beat outline with visual concepts
+3. **Narration** — Write spoken narration that complements images
+4. **Image Prompts** — Write detailed prompts for AI image generation with consistent Visual Brief
+5. **Assembly** — Combine into MulmoScript JSON and generate movie
+
+**Usage:**
+```
+/mulmocast:illustrate https://example.com/article
+/mulmocast:illustrate AI trends in 2026, illustrated
+/mulmocast:illustrate 宇宙の歴史をイラストで
 ```
 
 ### `/mulmocast:narrate`

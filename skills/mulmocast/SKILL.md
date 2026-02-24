@@ -24,6 +24,7 @@ When invoking a child skill, try the **namespaced name first**, then fall back t
 1. Try `mulmocast:story` → if not found, try `story`
 2. Try `mulmocast:narrate` → if not found, try `narrate`
 3. Try `mulmocast:extend` → if not found, try `extend`
+4. Try `mulmocast:illustrate` → if not found, try `illustrate`
 
 This ensures the dispatcher works both as an installed plugin (namespaced) and in local/symlinked setups (no namespace).
 
@@ -31,8 +32,10 @@ This ensures the dispatcher works both as an installed plugin (namespaced) and i
 
 Detect the input type and invoke the corresponding skill using the Skill tool:
 
-1. **URL** (starts with `http://` or `https://`) → invoke `story` skill
-   - The story skill will fetch the URL, research the content, and create a presentation
+1. **URL** (starts with `http://` or `https://`)
+   - If the input contains illustration keywords (see below) → invoke `illustrate` skill
+   - Otherwise → invoke `story` skill
+   - The selected skill will fetch the URL, research the content, and create a presentation
 
 2. **File path with presentation extension** (`.pdf`, `.pptx`, `.md`, `.key`) → invoke `narrate` skill
    - The narrate skill will convert the source file into a narrated ExtendedMulmoScript
@@ -40,8 +43,15 @@ Detect the input type and invoke the corresponding skill using the Skill tool:
 3. **File path with `.json` extension** → invoke `extend` skill
    - The extend skill will add metadata to the existing MulmoScript
 
-4. **Plain text** (no extension, not a URL) → invoke `story` skill
-   - Treat as a topic description for the story skill to research and create a presentation
+4. **Plain text** (no extension, not a URL)
+   - If the input contains illustration keywords (see below) → invoke `illustrate` skill
+   - Otherwise → invoke `story` skill
+   - Treat as a topic description for the selected skill to research and create a presentation
+
+### Illustration keywords
+
+Route to the `illustrate` skill when the input contains any of these keywords:
+`illustrate`, `illustrated`, `illustration`, `picture book`, `image-based`, `画像`, `イラスト`, `絵本`
 
 ## Examples
 
@@ -60,6 +70,15 @@ Detect the input type and invoke the corresponding skill using the Skill tool:
 
 /mulmocast AI trends in 2026
 → routes to story skill (try mulmocast:story, then story)
+
+/mulmocast https://example.com/article illustrate
+→ routes to illustrate skill (try mulmocast:illustrate, then illustrate)
+
+/mulmocast AI trends in 2026, illustrated
+→ routes to illustrate skill (try mulmocast:illustrate, then illustrate)
+
+/mulmocast 宇宙の歴史をイラストで
+→ routes to illustrate skill (try mulmocast:illustrate, then illustrate)
 ```
 
 ## Important
