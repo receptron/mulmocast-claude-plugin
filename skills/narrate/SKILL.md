@@ -258,7 +258,36 @@ Proceed to **Step 5** (Present Results).
 
 ---
 
-## Step 5: Present Results and Next Steps
+## Step 5: Add BGM and Present Results
+
+### Select BGM
+
+After generating the MulmoScript, add background music by choosing from the [mulmocast-media BGM catalog](https://github.com/receptron/mulmocast-media/tree/main/bgms) that matches the content mood:
+
+| BGM | Title | Mood | Best for |
+|-----|-------|------|----------|
+| `story001.mp3` | Whispered Melody | smooth, piano | Calm narratives, reflective stories |
+| `story002.mp3` | Rise and Shine | techno, inspiring, piano | Motivational, startup, tech innovation |
+| `story003.mp3` | Chasing the Sunset | piano, inspiring | Uplifting stories, journeys, aspirations |
+| `story004.mp3` | Whispering Keys | classical, ambient | Academic, research, thoughtful content |
+| `story005.mp3` | Whisper of Ivory | piano solo, classical | Elegant, formal, documentary |
+| `theme001.mp3` | Rise of the Flame | classical, emotional | Epic achievements, milestones, announcements |
+| `vibe001.mp3` | Let It Vibe! | rap, dance | Pop culture, entertainment, energetic |
+| `olympic001.mp3` | Olympic-style Theme | epic orchestral fanfare | Grand openings, celebrations, competitions |
+| `morning001.mp3` | Morning Dance | morning, piano solo | Lifestyle, daily routines, light topics |
+
+**URL pattern**: `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/{name}`
+
+Add `audioParams` to the generated MulmoScript (`scripts/{basename}/{basename}.json`) using the Edit tool:
+
+```json
+"audioParams": {
+  "bgm": { "kind": "url", "url": "https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/{selected}.mp3" },
+  "bgmVolume": 0.15
+}
+```
+
+### Present Results and Next Steps
 
 Display a summary:
 - Number of beats processed (for Markdown: total, core, and optional counts)
