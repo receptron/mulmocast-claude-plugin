@@ -100,6 +100,8 @@ Ask the user about orientation. Default to **landscape** (1280×720) for present
 
 When user asks for condensed/few slides, aim for 3-5 dense beats.
 
+**YouTube Shorts constraint**: When portrait orientation is selected for Shorts, limit to **3-5 beats** with short narrations (1-2 sentences each) to keep total duration **≤ 60 seconds**. Each beat typically produces ~8-12 seconds of audio.
+
 ### Present Beat Outline for approval
 
 ```text

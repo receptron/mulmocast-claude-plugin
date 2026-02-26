@@ -1,0 +1,14 @@
+{
+  "name": "mulmocast-claude-plugin",
+  "private": true,
+  "description": "Claude Code plugin for MulmoCast — AI-native multi-modal presentation platform.",
+  "homepage": "https://github.com/receptron/mulmocast-claude-plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/receptron/mulmocast-claude-plugin.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "googleapis": "^171.4.0"
+  }
+}

@@ -76,6 +76,16 @@ Add metadata to an existing MulmoScript to create an ExtendedMulmoScript. The me
 /mulmocast:extend scripts/my-talk/my-talk.json --source samples/my-talk.pdf
 ```
 
+### `/mulmocast:youtube-upload`
+
+Upload a video file to YouTube. Automatically detects Shorts-eligible videos (vertical, ≤60s) and adds `#Shorts` tag.
+
+**Usage:**
+```
+/mulmocast:youtube-upload output/my-video/my-video_ja.mp4
+/mulmocast:youtube-upload output/my-video/my-video_ja.mp4 "動画タイトル"
+```
+
 ## Installation
 
 ### Step 1: Add marketplace
@@ -120,6 +130,91 @@ claude --plugin-dir /path/to/mulmocast-claude-plugin
 Set these in a `.env` file in your project root.
 
 See [MulmoCast CLI setup](https://github.com/receptron/mulmocast-cli#configuration) for full details.
+
+## YouTube Upload Setup
+
+The `/mulmocast:youtube-upload` skill requires YouTube Data API credentials. Follow these steps to set up.
+
+### Step 1: Create a Google Cloud project
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Click **Select a project** → **New Project**
+3. Enter a project name (e.g. `mulmocast-youtube`) and click **Create**
+
+### Step 2: Enable YouTube Data API v3
+
+1. In your project, go to **APIs & Services** → **Library**
+2. Search for **YouTube Data API v3**
+3. Click **Enable**
+
+### Step 3: Create OAuth 2.0 credentials
+
+1. Go to **APIs & Services** → **Credentials**
+2. Click **Create Credentials** → **OAuth client ID**
+3. If prompted, configure the **OAuth consent screen** first:
+   - Choose **External** user type
+   - Fill in app name, user support email, and developer contact email
+   - Skip scopes — the auth script requests them automatically
+   - Click **Save and Return**
+4. Back on **Create OAuth client ID**:
+   - Application type: **Desktop app**
+   - Name: any name (e.g. `mulmocast-uploader`)
+   - Click **Create**
+5. Copy the **Client ID** and **Client Secret**
+
+### Step 4: Add yourself as a test user
+
+> **Important**: Without this step, authentication will fail with `Error 403: access_denied`.
+
+1. Go to **APIs & Services** → **OAuth consent screen**
+2. Click **Test users** → **Add users**
+3. Enter your Google account email address (the one you will use to upload videos)
+4. Click **Save**
+
+### Step 5: Set environment variables
+
+Add the credentials to your `.env` file in the plugin root:
+
+```
+YOUTUBE_CLIENT_ID=your_client_id_here
+YOUTUBE_CLIENT_SECRET=your_client_secret_here
+```
+
+### Step 6: Obtain a refresh token
+
+Run the auth script:
+
+```bash
+node scripts/youtube-auth.mjs
+```
+
+1. A URL will be displayed — open it in your browser
+2. Sign in with the Google account you added as a test user
+3. Grant the requested permissions
+4. The script outputs a refresh token — add it to `.env`:
+
+```
+YOUTUBE_REFRESH_TOKEN=your_refresh_token_here
+```
+
+### Step 7: Install dependencies
+
+```bash
+yarn install
+```
+
+### Step 8: Verify
+
+Test with an unlisted upload:
+
+```bash
+node scripts/youtube-upload.mjs \
+  --file "output/your-video/video.mp4" \
+  --title "Test Upload" \
+  --privacy unlisted
+```
+
+> **Note**: While the OAuth app is in "Testing" status, only registered test users can authenticate, and uploaded videos may default to **private** regardless of the `--privacy` setting. To lift these restrictions, submit the app for Google's verification review in the OAuth consent screen settings.
 
 ## License
 
