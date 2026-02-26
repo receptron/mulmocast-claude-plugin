@@ -284,7 +284,7 @@ For beats showing statistics or research findings, add `"reference": "Source: ..
 Generate the movie directly — `npx mulmocast@latest movie` automatically generates images and audio as well, so separate image/audio steps are unnecessary.
 
 ```bash
-npx mulmocast@latest movie <filename>
+npx mulmocast@latest movie --grouped <filename>
 ```
 
 ```text

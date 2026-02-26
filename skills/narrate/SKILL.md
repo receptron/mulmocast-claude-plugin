@@ -309,7 +309,7 @@ npx mulmocast-preprocessor summarize scripts/{basename}/extended_script.json
 
 ## Generate a narrated video
 npx mulmocast-preprocessor scripts/{basename}/extended_script.json -o scripts/{basename}/{basename}.json
-npx mulmocast@latest movie scripts/{basename}/{basename}.json
+npx mulmocast@latest movie --grouped scripts/{basename}/{basename}.json
 ```
 
 Ask the user if they want to adjust any narration or metadata before proceeding.
