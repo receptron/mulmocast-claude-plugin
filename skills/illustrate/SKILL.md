@@ -47,7 +47,7 @@ If the page has pagination, **fetch ALL pages** before proceeding.
 **Subject**: [one line]
 **Target audience**: [who]
 **Tone**: [professional / conversational / energetic / serious]
-**Orientation**: [landscape (1280×720) / portrait (720×1280)]
+**Orientation**: [landscape (1280×720) / portrait (1080×1920)]
 **Key insights** (3-5):
 1. ...
 
@@ -55,7 +55,7 @@ If the page has pagination, **fetch ALL pages** before proceeding.
 **Color palette**: [2-3 dominant colors for visual consistency]
 ```
 
-Ask the user about orientation. Default to **landscape** (1280×720) for presentations and standard videos. Use **portrait** (720×1280) for short-form content (TikTok, Reels, Shorts, Stories).
+Ask the user about orientation. Default to **landscape** (1280×720) for presentations and standard videos. Use **portrait** (1080×1920) for short-form content (TikTok, Reels, Shorts, Stories).
 
 ---
 
@@ -179,7 +179,7 @@ Select the BGM that best matches the tone from Phase 1's Topic Brief, and add it
 {
   "$mulmocast": { "version": "1.1" },
   "lang": "en",
-  "canvasSize": { "width": 1280, "height": 720 },  // portrait: { "width": 720, "height": 1280 }
+  "canvasSize": { "width": 1280, "height": 720 },  // portrait: { "width": 1080, "height": 1920 }
   "title": "Title",
   "description": "Brief description",
   "references": [{ "url": "...", "title": "...", "type": "article" }],
