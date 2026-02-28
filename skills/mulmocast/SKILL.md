@@ -53,6 +53,11 @@ Detect the input type and invoke the corresponding skill using the Skill tool:
 Route to the `illustrate` skill when the input contains any of these keywords:
 `illustrate`, `illustrated`, `illustration`, `picture book`, `image-based`, `画像`, `イラスト`, `絵本`
 
+### Animation keywords
+
+When the input contains animation keywords, pass them through to the routed skill (story or illustrate) so it knows to use `html_tailwind` animated beats:
+`animated`, `animation`, `html_tailwind`, `cinematic`, `opening crawl`, `3D`, `motion`, `アニメーション`, `動くスライド`
+
 ## Examples
 
 ```

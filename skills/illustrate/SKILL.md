@@ -257,3 +257,22 @@ When mixing slide beats with imagePrompt beats:
 - Add `slideParams.theme` to the top-level JSON (required for slide rendering)
 - Run `npx mulmocast@latest tool info themes --format json` to get theme definitions
 - See `references/slide_dsl_reference.md` for layout and block specifications
+
+Individual beats can also use `html_tailwind` animation for motion effects (cinematic intros, animated counters, 3D reveals):
+
+```json
+{
+  "duration": 3,
+  "image": {
+    "type": "html_tailwind",
+    "html": ["<div id='title' class='text-5xl font-bold text-white' style='opacity:0'>Title</div>"],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#title', { opacity: [0, 1], translateY: [30, 0] }, { start: 0, end: 0.5, easing: 'easeOut' });"
+    ],
+    "animation": true
+  }
+}
+```
+
+See `references/html_animation_reference.md` for the full animation API reference.
