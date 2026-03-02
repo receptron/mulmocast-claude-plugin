@@ -86,6 +86,42 @@ Upload a video file to YouTube. Automatically detects Shorts-eligible videos (ve
 /mulmocast:youtube-upload output/my-video/my-video_ja.mp4 "動画タイトル"
 ```
 
+### `/mulmocast:vocab-chat`
+
+Create a vocabulary learning chat video with messenger-style animated UI and voiceover narration.
+
+**Usage:**
+```
+/mulmocast:vocab-chat layover
+```
+
+### `/mulmocast:vocab-lesson`
+
+Create a vocabulary lesson video with multi-section structure (word display, examples, explanation, review with translation).
+
+**Usage:**
+```
+/mulmocast:vocab-lesson serendipity
+```
+
+### `/mulmocast:conversation-chat`
+
+Create a conversation practice chat video with speech bubble UI and character illustrations.
+
+**Usage:**
+```
+/mulmocast:conversation-chat ordering coffee
+```
+
+### `/mulmocast:stroke-order`
+
+Create a stroke order animation video using KanjiVG data. Supports hiragana, katakana, kanji, and Latin alphabet.
+
+**Usage:**
+```
+/mulmocast:stroke-order あいうえお
+```
+
 ## References
 
 The `references/` directory contains design guides for the `/mulmocast:story` skill:
