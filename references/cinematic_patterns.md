@@ -1343,6 +1343,844 @@ Text slowly appears letter by letter, as if being uncovered.
 
 ---
 
+## Theme 10: Terminator T-800 Vision
+
+**Mood**: Mechanical, threatening, cold machine intelligence
+**Voice**: Deep, flat, robotic (e.g., `onyx`)
+
+### BGM
+
+| Source | Track | URL |
+|--------|-------|-----|
+| mulmocast-media | llm001.mp3 | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/llm001.mp3` |
+| Mixkit | Cyberpunk City | `https://assets.mixkit.co/music/140/140.mp3` |
+| Mixkit | Sci-Fi Score | `https://assets.mixkit.co/music/464/464.mp3` |
+| Incompetech | Industrial Revolution | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Industrial%20Revolution.mp3` |
+| Incompetech | Mechanolith | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Mechanolith.mp3` |
+
+### Visual Identity
+
+| Element | Value |
+|---------|-------|
+| Background | `background:#1a0000` (dark red-black) |
+| Primary color | `color:#ff0000` (HUD red — targeting, borders, text) |
+| Secondary color | `color:#ff3333` (lighter red — labels, secondary text) |
+| Data color | `color:#ff6666` (soft red — counters, readouts) |
+| Muted | `color:#660000` (dark red — grid lines, faint elements) |
+| Font — all | `font-family:'Courier New',Monaco,monospace` (machine readout) |
+| Borders | `border:1px solid #660000` |
+| Panel background | `rgba(255,0,0,0.05)` |
+
+### Signature element — Red Scan Grid
+
+HUD targeting grid overlay with crosshair:
+
+```html
+<div class='absolute inset-0 pointer-events-none'>
+  <div style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>
+  <div style='position:absolute;top:50%;left:50%;width:80px;height:80px;transform:translate(-50%,-50%);border:2px solid rgba(255,0,0,0.4);border-radius:50%'></div>
+  <div style='position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,0,0,0.08)'></div>
+  <div style='position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,0,0,0.08)'></div>
+</div>
+```
+
+### Opening Beat — System Boot / Target Acquired
+
+Red HUD boots up with scan lines, targeting reticle pulses, status text appears.
+
+```json
+{
+  "duration": 4,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#1a0000'>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>",
+      "  <div id='reticle' class='absolute' style='top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%);border:2px solid #ff0000;border-radius:50%;opacity:0'></div>",
+      "  <div id='hline' class='absolute' style='top:50%;left:0;right:0;height:1px;background:#ff0000;opacity:0'></div>",
+      "  <div id='vline' class='absolute' style='left:50%;top:0;bottom:0;width:1px;background:#ff0000;opacity:0'></div>",
+      "  <div class='absolute top-8 left-8'>",
+      "    <div id='sys' class='text-xs tracking-[0.3em]' style='font-family:monospace;color:#ff3333;opacity:0'>CYBERDYNE SYSTEMS MODEL 101</div>",
+      "    <div id='mode' class='text-xs mt-1' style='font-family:monospace;color:#660000;opacity:0'>SCAN MODE: ACTIVE</div>",
+      "  </div>",
+      "  <div class='absolute bottom-8 right-8 text-right'>",
+      "    <div id='dist' class='text-xs' style='font-family:monospace;color:#ff6666;opacity:0'>DIST: <span id='distVal'></span>m</div>",
+      "    <div id='threat' class='text-xs mt-1' style='font-family:monospace;color:#ff0000;opacity:0'>THREAT: <span id='threatVal'></span>%</div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='target' class='text-5xl font-bold tracking-wider' style='font-family:monospace;color:#ff0000;opacity:0'>TARGET ACQUIRED</div>",
+      "    <div id='id' class='text-lg mt-4 tracking-[0.5em]' style='font-family:monospace;color:#ff3333;opacity:0'>SUBJECT IDENTIFIED</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#reticle', { opacity: [0, 0.6], width: [0, 120, 'px'], height: [0, 120, 'px'] }, { start: 0, end: 1.0, easing: 'easeOut' });",
+      "animation.animate('#hline', { opacity: [0, 0.15] }, { start: 0, end: 0.3 });",
+      "animation.animate('#vline', { opacity: [0, 0.15] }, { start: 0, end: 0.3 });",
+      "animation.animate('#sys', { opacity: [0, 1] }, { start: 0.2, end: 0.4 });",
+      "animation.animate('#mode', { opacity: [0, 1] }, { start: 0.5, end: 0.7 });",
+      "animation.blink('#mode', { interval: 0.8 });",
+      "animation.animate('#dist', { opacity: [0, 1] }, { start: 0.8, end: 1.0 });",
+      "animation.counter('#distVal', [250, 12], { start: 0.8, end: 3.0, decimals: 1 });",
+      "animation.animate('#threat', { opacity: [0, 1] }, { start: 1.0, end: 1.2 });",
+      "animation.counter('#threatVal', [0, 97], { start: 1.0, end: 2.5, decimals: 0 });",
+      "animation.animate('#target', { opacity: [0, 1] }, { start: 1.5, end: 1.8 });",
+      "animation.animate('#id', { opacity: [0, 1] }, { start: 2.0, end: 2.3 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Feature Beat — Analysis HUD
+
+Multi-zone data display: status bars, counters, blinking alerts.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#1a0000'>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>",
+      "  <div class='h-full flex flex-col justify-center px-16 relative'>",
+      "    <div id='header' class='text-xs tracking-[0.5em] mb-8' style='font-family:monospace;color:#ff3333;opacity:0'>TACTICAL ANALYSIS</div>",
+      "    <div class='flex gap-8'>",
+      "      <div class='flex-1'>",
+      "        <div id='r0' class='mb-6' style='opacity:0'>",
+      "          <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>POWER CELL</span><span id='v0'></span></div>",
+      "          <div style='background:#330000;height:6px;border-radius:2px'><div id='bar0' style='background:#ff0000;height:100%;border-radius:2px;width:0'></div></div>",
+      "        </div>",
+      "        <div id='r1' class='mb-6' style='opacity:0'>",
+      "          <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>NEURAL NET</span><span id='v1'></span></div>",
+      "          <div style='background:#330000;height:6px;border-radius:2px'><div id='bar1' style='background:#ff3333;height:100%;border-radius:2px;width:0'></div></div>",
+      "        </div>",
+      "        <div id='r2' class='mb-6' style='opacity:0'>",
+      "          <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>TARGETING</span><span id='v2'></span></div>",
+      "          <div style='background:#330000;height:6px;border-radius:2px'><div id='bar2' style='background:#ff0000;height:100%;border-radius:2px;width:0'></div></div>",
+      "        </div>",
+      "      </div>",
+      "      <div class='flex-1'>",
+      "        <div id='info0' class='text-sm mb-3' style='font-family:monospace;color:#ff3333;opacity:0'>▸ Primary objective: ACTIVE</div>",
+      "        <div id='info1' class='text-sm mb-3' style='font-family:monospace;color:#ff3333;opacity:0'>▸ Weapons system: ONLINE</div>",
+      "        <div id='info2' class='text-sm mb-3' style='font-family:monospace;color:#ff3333;opacity:0'>▸ Threat analysis: PROCESSING</div>",
+      "        <div id='warn' class='text-sm mt-6 font-bold' style='font-family:monospace;color:#ff0000;opacity:0'>⚠ ELEVATED THREAT LEVEL</div>",
+      "      </div>",
+      "    </div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#header', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
+      "animation.stagger('#r{i}', 3, { opacity: [0, 1] }, { start: 0.3, stagger: 0.3, duration: 0.2 });",
+      "animation.counter('#v0', [0, 87], { start: 0.5, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#bar0', { width: [0, 87, '%'] }, { start: 0.5, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#v1', [0, 100], { start: 0.8, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#bar1', { width: [0, 100, '%'] }, { start: 0.8, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#v2', [0, 94], { start: 1.1, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#bar2', { width: [0, 94, '%'] }, { start: 1.1, end: 2.5, easing: 'easeOut' });",
+      "animation.stagger('#info{i}', 3, { opacity: [0, 1], translateX: [-10, 0] }, { start: 1.5, stagger: 0.4, duration: 0.25, easing: 'easeOut' });",
+      "animation.animate('#warn', { opacity: [0, 1] }, { start: 3.5, end: 3.8 });",
+      "animation.blink('#warn', { interval: 0.4 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Closing Beat — Mission Status
+
+Full-screen mission result with data counters.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#1a0000'>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='status' class='text-6xl font-bold tracking-wider' style='font-family:monospace;color:#ff0000;opacity:0'>MISSION COMPLETE</div>",
+      "    <div id='line' class='mt-6 h-px' style='background:#ff0000;opacity:0;width:0'></div>",
+      "    <div id='summary' class='text-xl mt-6 tracking-wider' style='font-family:monospace;color:#ff3333;opacity:0'>I'LL BE BACK.</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#status', { opacity: [0, 1] }, { start: 0.5, end: 1.0 });",
+      "animation.animate('#line', { opacity: [0, 0.6], width: [0, 500, 'px'] }, { start: 1.0, end: 2.0, easing: 'easeOut' });",
+      "animation.animate('#summary', { opacity: [0, 1] }, { start: 2.5, end: 3.0 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+---
+
+## Theme 11: Dragon Ball Scouter
+
+**Mood**: Intense, explosive, power escalation
+**Voice**: Energetic, excited (e.g., `nova`, `shimmer`)
+
+### BGM
+
+| Source | Track | URL |
+|--------|-------|-----|
+| mulmocast-media | olympic001.mp3 (epic fanfare) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/olympic001.mp3` |
+| mulmocast-media | theme001.mp3 (epic orchestral) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/theme001.mp3` |
+| Mixkit | Epic Games | `https://assets.mixkit.co/music/76/76.mp3` |
+| Mixkit | Epical Drums 01 | `https://assets.mixkit.co/music/676/676.mp3` |
+| Incompetech | Five Armies | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Five%20Armies.mp3` |
+| Incompetech | Heroic Age | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Heroic%20Age.mp3` |
+
+### Visual Identity
+
+| Element | Value |
+|---------|-------|
+| Background | `background:#001a00` (dark green-black, scouter lens tint) |
+| Primary color | `color:#00ff66` (scouter green — readouts, borders) |
+| Secondary color | `color:#00cc44` (darker green — labels, secondary text) |
+| Alert color | `color:#ff3300` (red — danger, power overflow) |
+| Muted | `color:#004d1a` (very dark green — grid, faint) |
+| Font — readout | `font-family:'Courier New',Monaco,monospace` |
+| Font — labels | `font-family:Impact,'Arial Black',sans-serif` (bold power display) |
+| Borders | `border:2px solid rgba(0,255,102,0.3)` |
+
+### Signature element — Scouter Frame
+
+Circular lens frame with scan sweep:
+
+```html
+<div class='absolute inset-0 pointer-events-none'>
+  <div style='position:absolute;top:50%;left:50%;width:500px;height:500px;transform:translate(-50%,-50%);border:3px solid rgba(0,255,102,0.2);border-radius:50%'></div>
+  <div style='position:absolute;top:50%;left:50%;width:350px;height:350px;transform:translate(-50%,-50%);border:1px solid rgba(0,255,102,0.1);border-radius:50%'></div>
+  <div style='position:absolute;top:50%;left:50%;width:200px;height:200px;transform:translate(-50%,-50%);border:1px solid rgba(0,255,102,0.08);border-radius:50%'></div>
+</div>
+```
+
+### Opening Beat — Power Level Scan
+
+Scouter activates, scans target, power level counter races upward.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#001a00'>",
+      "  <div class='absolute inset-0 pointer-events-none'>",
+      "    <div id='ring1' style='position:absolute;top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%);border:3px solid rgba(0,255,102,0.3);border-radius:50%;opacity:0'></div>",
+      "    <div id='ring2' style='position:absolute;top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%);border:1px solid rgba(0,255,102,0.15);border-radius:50%;opacity:0'></div>",
+      "  </div>",
+      "  <div class='absolute top-6 left-8'>",
+      "    <div id='scouter' class='text-xs tracking-[0.3em]' style='font-family:monospace;color:#00cc44;opacity:0'>SCOUTER v3.0 — ACTIVE</div>",
+      "  </div>",
+      "  <div class='absolute top-6 right-8 text-right'>",
+      "    <div id='scanLabel' class='text-xs' style='font-family:monospace;color:#004d1a;opacity:0'>SCANNING...</div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='label' class='text-sm tracking-[0.5em] mb-4' style='font-family:monospace;color:#00cc44;opacity:0'>戦 闘 力</div>",
+      "    <div id='power' class='font-bold' style='font-family:Impact,\"Arial Black\",sans-serif;color:#00ff66;font-size:120px'></div>",
+      "    <div id='alert' class='text-xl mt-6 font-bold tracking-wider' style='font-family:monospace;color:#ff3300;opacity:0'>!!! OVER 9000 !!!</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#ring1', { opacity: [0, 0.5], width: [0, 500, 'px'], height: [0, 500, 'px'] }, { start: 0, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#ring2', { opacity: [0, 0.3], width: [0, 350, 'px'], height: [0, 350, 'px'] }, { start: 0.3, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#scouter', { opacity: [0, 1] }, { start: 0.2, end: 0.4 });",
+      "animation.animate('#scanLabel', { opacity: [0, 1] }, { start: 0.3, end: 0.5 });",
+      "animation.blink('#scanLabel', { interval: 0.3 });",
+      "animation.animate('#label', { opacity: [0, 1] }, { start: 0.5, end: 0.8 });",
+      "animation.counter('#power', [0, 9001], { start: 0.8, end: 3.5, decimals: 0 });",
+      "animation.animate('#alert', { opacity: [0, 1] }, { start: 3.5, end: 3.8 });",
+      "animation.blink('#alert', { interval: 0.25 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Feature Beat — Multi-Target Analysis
+
+Grid of targets with individual power levels and status indicators.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#001a00'>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 58px,rgba(0,255,102,0.04) 58px,rgba(0,255,102,0.04) 60px),repeating-linear-gradient(90deg,transparent,transparent 58px,rgba(0,255,102,0.04) 58px,rgba(0,255,102,0.04) 60px)'></div>",
+      "  <div class='h-full flex flex-col justify-center px-16 relative'>",
+      "    <div id='header' class='text-xs tracking-[0.5em] mb-8' style='font-family:monospace;color:#00cc44;opacity:0'>TARGET ANALYSIS</div>",
+      "    <div class='grid grid-cols-3 gap-6'>",
+      "      <div id='t0' class='p-5 text-center' style='border:2px solid rgba(0,255,102,0.3);background:rgba(0,255,102,0.03);opacity:0'>",
+      "        <div class='text-xs tracking-widest mb-2' style='font-family:monospace;color:#00cc44'>TARGET A</div>",
+      "        <div id='p0' class='text-4xl font-bold' style='font-family:Impact,sans-serif;color:#00ff66'></div>",
+      "        <div class='text-xs mt-2' style='font-family:monospace;color:#004d1a'>STATUS: NORMAL</div>",
+      "      </div>",
+      "      <div id='t1' class='p-5 text-center' style='border:2px solid rgba(0,255,102,0.3);background:rgba(0,255,102,0.03);opacity:0'>",
+      "        <div class='text-xs tracking-widest mb-2' style='font-family:monospace;color:#00cc44'>TARGET B</div>",
+      "        <div id='p1' class='text-4xl font-bold' style='font-family:Impact,sans-serif;color:#00ff66'></div>",
+      "        <div class='text-xs mt-2' style='font-family:monospace;color:#004d1a'>STATUS: ELEVATED</div>",
+      "      </div>",
+      "      <div id='t2' class='p-5 text-center' style='border:2px solid rgba(255,51,0,0.4);background:rgba(255,51,0,0.05);opacity:0'>",
+      "        <div class='text-xs tracking-widest mb-2' style='font-family:monospace;color:#ff3300'>TARGET C</div>",
+      "        <div id='p2' class='text-4xl font-bold' style='font-family:Impact,sans-serif;color:#ff3300'></div>",
+      "        <div id='danger' class='text-xs mt-2 font-bold' style='font-family:monospace;color:#ff3300'>⚠ DANGER</div>",
+      "      </div>",
+      "    </div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#header', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
+      "animation.stagger('#t{i}', 3, { opacity: [0, 1], translateY: [15, 0] }, { start: 0.3, stagger: 0.4, duration: 0.3, easing: 'easeOut' });",
+      "animation.counter('#p0', [0, 1200], { start: 0.5, end: 2.5, decimals: 0 });",
+      "animation.counter('#p1', [0, 4500], { start: 0.9, end: 2.5, decimals: 0 });",
+      "animation.counter('#p2', [0, 53000], { start: 1.3, end: 3.0, decimals: 0 });",
+      "animation.blink('#danger', { interval: 0.3 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Closing Beat — Scouter Explosion
+
+Power level overloads — screen cracks/flashes. The counter runs to overflow, then red flash.
+
+```json
+{
+  "duration": 4,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#001a00'>",
+      "  <div id='flash' class='absolute inset-0' style='background:#ff3300;opacity:0'></div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='label' class='text-sm tracking-[0.5em] mb-4' style='font-family:monospace;color:#00cc44;opacity:0'>戦 闘 力</div>",
+      "    <div id='power' class='font-bold' style='font-family:Impact,\"Arial Black\",sans-serif;color:#00ff66;font-size:100px'></div>",
+      "    <div id='error' class='text-3xl mt-8 font-bold tracking-wider' style='font-family:monospace;color:#ff3300;opacity:0'>ERROR — CANNOT COMPUTE</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#label', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
+      "animation.counter('#power', [0, 999999], { start: 0.3, end: 2.5, decimals: 0 });",
+      "animation.animate('#flash', { opacity: [0, 0.6] }, { start: 2.5, end: 2.7 });",
+      "animation.animate('#flash', { opacity: [0.6, 0] }, { start: 2.7, end: 3.0 });",
+      "animation.animate('#error', { opacity: [0, 1] }, { start: 2.8, end: 3.1 });",
+      "animation.blink('#error', { interval: 0.2 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+---
+
+## Theme 12: Blade Runner
+
+**Mood**: Melancholy, rain-soaked neon, existential, retro-futuristic
+**Voice**: Low, contemplative (e.g., `echo`, `onyx`)
+
+### BGM
+
+| Source | Track | URL |
+|--------|-------|-----|
+| mulmocast-media | story001.mp3 (smooth, piano) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/story001.mp3` |
+| mulmocast-media | story004.mp3 (classical, ambient) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/story004.mp3` |
+| Mixkit | Echoes | `https://assets.mixkit.co/music/188/188.mp3` |
+| Mixkit | Vertigo | `https://assets.mixkit.co/music/597/597.mp3` |
+| Incompetech | Neon Laser Horizon | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Neon%20Laser%20Horizon.mp3` |
+| Incompetech | Luminous Rain | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Luminous%20Rain.mp3` |
+
+### Visual Identity
+
+| Element | Value |
+|---------|-------|
+| Background | `background:#0a0a14` (deep blue-black) |
+| Primary color | `color:#ff6a00` (neon orange — accents, highlights) |
+| Secondary color | `color:#00b4d8` (teal/cyan — UI elements, text) |
+| Warm accent | `color:#e76f51` (warm orange-red — emphasis) |
+| Muted | `color:#555570` (blue-gray — body text) |
+| Font — headings | `font-family:Georgia,"Times New Roman",serif` |
+| Font — UI/labels | `font-family:'Courier New',Monaco,monospace` |
+| Borders | `border:1px solid #1a1a2e` |
+
+### Signature element — Neon Rain
+
+Vertical rain streaks with neon glow:
+
+```javascript
+"var rain = document.getElementById('rain');",
+"for (var i = 0; i < 60; i++) {",
+"  var d = document.createElement('div');",
+"  var x = (Math.sin(i*311.7)*0.5+0.5)*100;",
+"  var h = (Math.sin(i*127.1)*0.5+0.5)*30+10;",
+"  var op = (Math.sin(i*43.1)*0.5+0.5)*0.3+0.05;",
+"  var colors = ['#00b4d8','#ff6a00','#e76f51'];",
+"  var c = colors[Math.floor(Math.abs(Math.sin(i*73.3))*3)];",
+"  d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,'+c+');opacity:'+op;",
+"  d.id='drop'+i; rain.appendChild(d);",
+"}"
+```
+
+### Opening Beat — Rain City Title
+
+Title fades in over falling rain. Slow, melancholic.
+
+```json
+{
+  "duration": 6,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0a14'>",
+      "  <div id='rain' class='absolute inset-0'></div>",
+      "  <div class='absolute bottom-0 left-0 right-0 h-16' style='background:linear-gradient(0deg,rgba(255,106,0,0.08),transparent)'></div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='title' class='text-7xl font-bold tracking-wider text-center' style='font-family:Georgia,serif;color:#ff6a00;opacity:0;text-shadow:0 0 30px rgba(255,106,0,0.3)'>TITLE</div>",
+      "    <div id='subtitle' class='text-xl mt-6 tracking-[0.3em]' style='font-family:\"Courier New\",monospace;color:#00b4d8;opacity:0'>Like tears in rain</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "var rain = document.getElementById('rain');",
+      "for (var i = 0; i < 60; i++) { var d = document.createElement('div'); var x = (Math.sin(i*311.7)*0.5+0.5)*100; var h = (Math.sin(i*127.1)*0.5+0.5)*30+10; var op = (Math.sin(i*43.1)*0.5+0.5)*0.3+0.05; var colors = ['#00b4d8','#ff6a00','#e76f51']; var c = colors[Math.floor(Math.abs(Math.sin(i*73.3))*3)]; d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,'+c+');opacity:'+op; d.id='drop'+i; rain.appendChild(d); }",
+      "const animation = new MulmoAnimation();",
+      "for (var k = 0; k < 60; k++) { var spd = (Math.sin(k*43.7)*0.5+0.5)*1.5+0.5; animation.animate('#drop'+k, { translateY: [0, 800] }, { start: spd*0.3, end: 'auto' }); }",
+      "animation.animate('#title', { opacity: [0, 1] }, { start: 1.0, end: 2.5 });",
+      "animation.animate('#subtitle', { opacity: [0, 0.7] }, { start: 3.0, end: 4.5 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Feature Beat — Voight-Kampff Terminal
+
+Retro analysis terminal with blinking cursor, result data.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0a0a14'>",
+      "  <div class='absolute inset-0 pointer-events-none' style='background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,180,216,0.02) 3px,rgba(0,180,216,0.02) 4px)'></div>",
+      "  <div class='h-full flex flex-col justify-center px-20 relative'>",
+      "    <div id='label' class='text-xs tracking-[0.5em] mb-6' style='font-family:monospace;color:#ff6a00;opacity:0'>VOIGHT-KAMPFF ANALYSIS v6.2</div>",
+      "    <div class='p-6 rounded' style='border:1px solid #1a1a2e;background:rgba(10,10,20,0.8)'>",
+      "      <div id='q' class='text-lg mb-4' style='font-family:Georgia,serif;color:#00b4d8'></div>",
+      "      <div id='cur' style='font-family:monospace;color:#00b4d8'>&#9608;</div>",
+      "      <div class='mt-6 pt-4' style='border-top:1px solid #1a1a2e'>",
+      "        <div id='r0' class='flex justify-between text-sm mb-2' style='font-family:monospace;opacity:0'><span style='color:#555570'>EMPATHY RESPONSE</span><span id='e0' style='color:#ff6a00'></span></div>",
+      "        <div id='r1' class='flex justify-between text-sm mb-2' style='font-family:monospace;opacity:0'><span style='color:#555570'>PUPIL DILATION</span><span id='e1' style='color:#ff6a00'></span></div>",
+      "        <div id='r2' class='flex justify-between text-sm' style='font-family:monospace;opacity:0'><span style='color:#555570'>BLUSH RESPONSE</span><span id='e2' style='color:#ff6a00'></span></div>",
+      "      </div>",
+      "      <div id='result' class='mt-6 text-lg font-bold tracking-wider text-center' style='font-family:monospace;color:#e76f51;opacity:0'>RESULT: INCONCLUSIVE</div>",
+      "    </div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#label', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
+      "animation.typewriter('#q', 'Describe in single words only the good things that come into your mind about your mother.', { start: 0.3, end: 2.5 });",
+      "animation.blink('#cur', { interval: 0.35 });",
+      "animation.stagger('#r{i}', 3, { opacity: [0, 1] }, { start: 2.8, stagger: 0.3, duration: 0.2 });",
+      "animation.counter('#e0', [0, 0.73], { start: 3.0, end: 3.8, decimals: 2 });",
+      "animation.counter('#e1', [0, 2.4], { start: 3.3, end: 4.0, decimals: 1, suffix: 'mm' });",
+      "animation.counter('#e2', [0, 0.12], { start: 3.6, end: 4.2, decimals: 2 });",
+      "animation.animate('#result', { opacity: [0, 1] }, { start: 4.3, end: 4.6 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Closing Beat — Tears in Rain
+
+Iconic monologue quote fading slowly on rain backdrop.
+
+```json
+{
+  "duration": 6,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0a14'>",
+      "  <div id='rain' class='absolute inset-0'></div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative px-24'>",
+      "    <div id='quote' class='text-3xl italic leading-relaxed text-center' style='font-family:Georgia,serif;color:#00b4d8;opacity:0'>\"All those moments will be lost in time, like tears in rain.\"</div>",
+      "    <div id='line' class='mt-8 h-px' style='background:linear-gradient(90deg,transparent,#ff6a00,transparent);opacity:0;width:0'></div>",
+      "    <div id='label' class='text-sm mt-6 tracking-[0.3em]' style='font-family:monospace;color:#555570;opacity:0'>TIME TO DIE</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "var rain = document.getElementById('rain');",
+      "for (var i = 0; i < 40; i++) { var d = document.createElement('div'); var x = (Math.sin(i*311.7)*0.5+0.5)*100; var h = (Math.sin(i*127.1)*0.5+0.5)*20+8; d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,#00b4d8);opacity:'+(Math.sin(i*43.1)*0.1+0.1); d.id='drop'+i; rain.appendChild(d); }",
+      "const animation = new MulmoAnimation();",
+      "for (var k = 0; k < 40; k++) { animation.animate('#drop'+k, { translateY: [0, 800] }, { start: (Math.sin(k*43.7)*0.5+0.5)*1.0, end: 'auto' }); }",
+      "animation.animate('#quote', { opacity: [0, 1] }, { start: 0.5, end: 2.5 });",
+      "animation.animate('#line', { opacity: [0, 0.5], width: [0, 400, 'px'] }, { start: 2.5, end: 3.5, easing: 'easeOut' });",
+      "animation.animate('#label', { opacity: [0, 0.5] }, { start: 3.5, end: 4.5 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+---
+
+## Theme 13: Total Recall (Rekall Memory Implant)
+
+**Mood**: Disorienting, surreal, reality-bending, retro sci-fi
+**Voice**: Smooth, slightly unsettling (e.g., `echo`, `shimmer`)
+
+### BGM
+
+| Source | Track | URL |
+|--------|-------|-----|
+| mulmocast-media | story002.mp3 (techno, inspiring) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/story002.mp3` |
+| Mixkit | Brainiac | `https://assets.mixkit.co/music/167/167.mp3` |
+| Mixkit | Delirium | `https://assets.mixkit.co/music/605/605.mp3` |
+| Incompetech | Crypto | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Crypto.mp3` |
+| Incompetech | Mystery Bazaar | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Mystery%20Bazaar.mp3` |
+
+### Visual Identity
+
+| Element | Value |
+|---------|-------|
+| Background | `background:#0d0000` (dark with red-mars tint) |
+| Primary color | `color:#ff4444` (Rekall red — UI, borders, headings) |
+| Secondary color | `color:#00ccaa` (teal/green — memory data, holographic) |
+| Glitch | `color:#ffffff` (white — flashes, reality breaks) |
+| Muted | `color:#553333` (dim red-brown) |
+| Font — headings | `font-family:'Arial Black',Impact,sans-serif` |
+| Font — data/UI | `font-family:'Courier New',Monaco,monospace` |
+
+### Signature element — Glitch / Memory Distortion
+
+Horizontal offset bands that simulate a glitched signal:
+
+```html
+<div class='absolute inset-0 pointer-events-none overflow-hidden'>
+  <div id='glitch1' style='position:absolute;top:30%;left:-5px;right:0;height:3px;background:#ff4444;opacity:0'></div>
+  <div id='glitch2' style='position:absolute;top:60%;left:0;right:-5px;height:2px;background:#00ccaa;opacity:0'></div>
+  <div id='glitch3' style='position:absolute;top:75%;left:-3px;right:0;height:4px;background:#ffffff;opacity:0'></div>
+</div>
+```
+
+### Opening Beat — Rekall Memory Implant Start
+
+Memory implant UI boots up with progress counter and reality glitch.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0d0000'>",
+      "  <div id='g1' class='absolute' style='top:25%;left:-5px;right:0;height:3px;background:#ff4444;opacity:0'></div>",
+      "  <div id='g2' class='absolute' style='top:65%;left:0;right:-3px;height:2px;background:#00ccaa;opacity:0'></div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='logo' class='text-sm tracking-[0.5em] mb-8' style='font-family:monospace;color:#ff4444;opacity:0'>R E K A L L   I N C.</div>",
+      "    <div id='title' class='text-6xl font-bold tracking-wider' style='font-family:\"Arial Black\",Impact,sans-serif;color:#ff4444;opacity:0'>MEMORY IMPLANT</div>",
+      "    <div class='mt-10 w-96'>",
+      "      <div class='flex justify-between text-xs mb-2' style='font-family:monospace'><span id='status' style='color:#553333;opacity:0'>INITIALIZING...</span><span id='pct' style='color:#ff4444'></span></div>",
+      "      <div style='background:#330000;height:8px;border-radius:4px'><div id='bar' style='background:linear-gradient(90deg,#ff4444,#00ccaa);height:100%;border-radius:4px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='warn' class='text-sm mt-8 tracking-wider' style='font-family:monospace;color:#00ccaa;opacity:0'>DO NOT ATTEMPT TO RESIST</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#logo', { opacity: [0, 1] }, { start: 0.2, end: 0.5 });",
+      "animation.animate('#title', { opacity: [0, 1], scale: [1.05, 1] }, { start: 0.5, end: 1.0, easing: 'easeOut' });",
+      "animation.animate('#status', { opacity: [0, 1] }, { start: 1.2, end: 1.4 });",
+      "animation.counter('#pct', [0, 100], { start: 1.2, end: 3.8, suffix: '%', decimals: 0 });",
+      "animation.animate('#bar', { width: [0, 100, '%'] }, { start: 1.2, end: 3.8, easing: 'easeInOut' });",
+      "animation.animate('#g1', { opacity: [0, 0.6] }, { start: 2.0, end: 2.1 });",
+      "animation.animate('#g1', { opacity: [0.6, 0] }, { start: 2.1, end: 2.3 });",
+      "animation.animate('#g2', { opacity: [0, 0.4] }, { start: 3.0, end: 3.1 });",
+      "animation.animate('#g2', { opacity: [0.4, 0] }, { start: 3.1, end: 3.3 });",
+      "animation.animate('#warn', { opacity: [0, 1] }, { start: 3.5, end: 4.0 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Feature Beat — Memory Fragment / Split Reality
+
+Left: "Real" memory (teal). Right: "Implanted" memory (red). Dual panels.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0d0000'>",
+      "  <div class='h-full flex'>",
+      "    <div id='left' class='flex-1 flex flex-col justify-center px-12' style='border-right:2px solid #553333;opacity:0'>",
+      "      <div class='text-xs tracking-[0.3em] mb-4' style='font-family:monospace;color:#00ccaa'>MEMORY — REAL</div>",
+      "      <div class='text-3xl font-bold mb-4' style='font-family:\"Arial Black\",sans-serif;color:#00ccaa'>Earth</div>",
+      "      <div class='text-sm leading-relaxed' style='font-family:monospace;color:#558888'>Original memories verified. Neural patterns consistent with baseline profile.</div>",
+      "    </div>",
+      "    <div id='right' class='flex-1 flex flex-col justify-center px-12' style='opacity:0'>",
+      "      <div class='text-xs tracking-[0.3em] mb-4' style='font-family:monospace;color:#ff4444'>MEMORY — IMPLANTED</div>",
+      "      <div class='text-3xl font-bold mb-4' style='font-family:\"Arial Black\",sans-serif;color:#ff4444'>Mars</div>",
+      "      <div class='text-sm leading-relaxed' style='font-family:monospace;color:#885555'>Synthetic memory detected. Origin: Rekall Inc. Classification: SECRET AGENT PACKAGE.</div>",
+      "    </div>",
+      "  </div>",
+      "  <div id='divider' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);font-family:monospace;color:white;font-size:24px;opacity:0'>?</div>",
+      "  <div id='g1' class='absolute' style='top:40%;left:0;right:0;height:3px;background:#ffffff;opacity:0'></div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#left', { opacity: [0, 1], translateX: [-20, 0] }, { start: 0.3, end: 1.0, easing: 'easeOut' });",
+      "animation.animate('#right', { opacity: [0, 1], translateX: [20, 0] }, { start: 0.8, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#divider', { opacity: [0, 1], scale: [2, 1] }, { start: 1.5, end: 2.0, easing: 'easeOut' });",
+      "animation.animate('#g1', { opacity: [0, 0.5] }, { start: 2.5, end: 2.6 });",
+      "animation.animate('#g1', { opacity: [0.5, 0] }, { start: 2.6, end: 2.8 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Closing Beat — "What is Real?"
+
+Fragmented text with multiple glitch pulses.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0d0000'>",
+      "  <div id='g1' class='absolute' style='top:30%;left:-5px;right:0;height:3px;background:#ff4444;opacity:0'></div>",
+      "  <div id='g2' class='absolute' style='top:55%;left:0;right:-3px;height:2px;background:#00ccaa;opacity:0'></div>",
+      "  <div id='g3' class='absolute' style='top:80%;left:-3px;right:0;height:4px;background:#ffffff;opacity:0'></div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='q' class='text-6xl font-bold tracking-wider text-center' style='font-family:\"Arial Black\",sans-serif;color:#ff4444;opacity:0'>WHAT IS REAL?</div>",
+      "    <div id='sub' class='text-xl mt-6' style='font-family:monospace;color:#00ccaa;opacity:0'>If you can't tell the difference, does it matter?</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#q', { opacity: [0, 1] }, { start: 0.5, end: 1.5 });",
+      "animation.animate('#g1', { opacity: [0, 0.7] }, { start: 1.5, end: 1.6 });",
+      "animation.animate('#g1', { opacity: [0.7, 0] }, { start: 1.6, end: 1.8 });",
+      "animation.animate('#g2', { opacity: [0, 0.5] }, { start: 2.0, end: 2.1 });",
+      "animation.animate('#g2', { opacity: [0.5, 0] }, { start: 2.1, end: 2.3 });",
+      "animation.animate('#g3', { opacity: [0, 0.8] }, { start: 2.5, end: 2.6 });",
+      "animation.animate('#g3', { opacity: [0.8, 0] }, { start: 2.6, end: 2.8 });",
+      "animation.animate('#sub', { opacity: [0, 0.7] }, { start: 3.0, end: 4.0 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+---
+
+## Theme 14: Iron Man JARVIS HUD
+
+**Mood**: Sleek, futuristic, heroic tech, holographic
+**Voice**: Smooth, precise (e.g., `shimmer`, `nova`)
+
+### BGM
+
+| Source | Track | URL |
+|--------|-------|-----|
+| mulmocast-media | story002.mp3 (techno, inspiring) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/story002.mp3` |
+| mulmocast-media | story003.mp3 (piano, inspiring) | `https://github.com/receptron/mulmocast-media/raw/refs/heads/main/bgms/story003.mp3` |
+| Mixkit | Life's a Movie | `https://assets.mixkit.co/music/322/322.mp3` |
+| Incompetech | Hero Theme | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Hero%20Theme.mp3` |
+| Incompetech | Heroic Age | `https://incompetech.com/music/royalty-free/mp3-royaltyfree/Heroic%20Age.mp3` |
+
+### Visual Identity
+
+| Element | Value |
+|---------|-------|
+| Background | `background:#0a0e1a` (deep navy) |
+| Primary color | `color:#4fc3f7` (JARVIS blue — UI, borders, text) |
+| Secondary color | `color:#81d4fa` (light blue — labels, secondary) |
+| Accent | `color:#ffffff` (white — highlights, key data) |
+| Warm accent | `color:#ff9800` (amber — warnings, power indicators) |
+| Muted | `color:#1a3a5c` (dark blue — grid, subtle elements) |
+| Font — headings | `font-family:'Helvetica Neue',Arial,sans-serif` (clean, modern) |
+| Font — data | `font-family:'Courier New',Monaco,monospace` |
+| Panel background | `rgba(79,195,247,0.05)` |
+| Borders | `border:1px solid rgba(79,195,247,0.2)` |
+
+### Signature element — Arc Reactor Rings
+
+Concentric rotating rings simulating the arc reactor:
+
+```html
+<div class='absolute inset-0 pointer-events-none flex items-center justify-center'>
+  <div style='position:absolute;width:400px;height:400px;border:1px solid rgba(79,195,247,0.1);border-radius:50%'></div>
+  <div style='position:absolute;width:280px;height:280px;border:1px solid rgba(79,195,247,0.15);border-radius:50%'></div>
+  <div style='position:absolute;width:160px;height:160px;border:1px solid rgba(79,195,247,0.08);border-radius:50%'></div>
+  <div style='position:absolute;width:8px;height:8px;background:#4fc3f7;border-radius:50%;box-shadow:0 0 20px #4fc3f7,0 0 40px rgba(79,195,247,0.3)'></div>
+</div>
+```
+
+### Opening Beat — JARVIS System Activation
+
+Arc reactor rings expand outward, system status lines cascade in.
+
+```json
+{
+  "duration": 4,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0a0e1a'>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div id='ring1' style='position:absolute;width:0;height:0;border:1px solid rgba(79,195,247,0.2);border-radius:50%;opacity:0'></div>",
+      "    <div id='ring2' style='position:absolute;width:0;height:0;border:1px solid rgba(79,195,247,0.15);border-radius:50%;opacity:0'></div>",
+      "    <div id='core' style='position:absolute;width:0;height:0;background:#4fc3f7;border-radius:50%;box-shadow:0 0 20px #4fc3f7;opacity:0'></div>",
+      "  </div>",
+      "  <div class='absolute top-8 left-10'>",
+      "    <div id='s0' class='text-xs mb-1' style='font-family:monospace;color:#4fc3f7;opacity:0'>JARVIS v7.2 — Online</div>",
+      "    <div id='s1' class='text-xs mb-1' style='font-family:monospace;color:#1a3a5c;opacity:0'>Arc Reactor: 100%</div>",
+      "    <div id='s2' class='text-xs' style='font-family:monospace;color:#1a3a5c;opacity:0'>All systems nominal</div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='greeting' class='text-3xl tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#81d4fa;opacity:0'>Good evening, sir.</div>",
+      "    <div id='title' class='text-6xl font-bold mt-4 tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#4fc3f7;opacity:0;text-shadow:0 0 30px rgba(79,195,247,0.3)'>TITLE</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#core', { opacity: [0, 1], width: [0, 12, 'px'], height: [0, 12, 'px'] }, { start: 0, end: 0.5, easing: 'easeOut' });",
+      "animation.animate('#ring2', { opacity: [0, 0.5], width: [0, 280, 'px'], height: [0, 280, 'px'] }, { start: 0.2, end: 1.2, easing: 'easeOut' });",
+      "animation.animate('#ring1', { opacity: [0, 0.3], width: [0, 400, 'px'], height: [0, 400, 'px'] }, { start: 0.4, end: 1.5, easing: 'easeOut' });",
+      "animation.stagger('#s{i}', 3, { opacity: [0, 1] }, { start: 0.5, stagger: 0.25, duration: 0.15 });",
+      "animation.animate('#greeting', { opacity: [0, 1] }, { start: 1.0, end: 1.5 });",
+      "animation.animate('#title', { opacity: [0, 1], scale: [1.1, 1] }, { start: 1.5, end: 2.2, easing: 'easeOut' });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Feature Beat — Holographic Dashboard
+
+Floating data panels with counters and progress indicators, JARVIS blue glow.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0a0e1a'>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div style='width:500px;height:500px;border:1px solid rgba(79,195,247,0.06);border-radius:50%'></div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col justify-center px-16 relative'>",
+      "    <div id='header' class='text-xs tracking-[0.5em] mb-8' style='font-family:monospace;color:#4fc3f7;opacity:0'>SYSTEM DIAGNOSTICS</div>",
+      "    <div class='grid grid-cols-3 gap-5'>",
+      "      <div id='p0' class='p-5' style='border:1px solid rgba(79,195,247,0.2);background:rgba(79,195,247,0.03);opacity:0'>",
+      "        <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>ARC REACTOR</div>",
+      "        <div id='n0' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div>",
+      "        <div style='background:rgba(79,195,247,0.1);height:4px;border-radius:2px;margin-top:8px'><div id='b0' style='background:#4fc3f7;height:100%;border-radius:2px;width:0'></div></div>",
+      "      </div>",
+      "      <div id='p1' class='p-5' style='border:1px solid rgba(79,195,247,0.2);background:rgba(79,195,247,0.03);opacity:0'>",
+      "        <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>THRUSTERS</div>",
+      "        <div id='n1' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div>",
+      "        <div style='background:rgba(79,195,247,0.1);height:4px;border-radius:2px;margin-top:8px'><div id='b1' style='background:#4fc3f7;height:100%;border-radius:2px;width:0'></div></div>",
+      "      </div>",
+      "      <div id='p2' class='p-5' style='border:1px solid rgba(255,152,0,0.3);background:rgba(255,152,0,0.03);opacity:0'>",
+      "        <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#ff9800'>WEAPONS</div>",
+      "        <div id='n2' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:#ff9800'></div>",
+      "        <div style='background:rgba(255,152,0,0.1);height:4px;border-radius:2px;margin-top:8px'><div id='b2' style='background:#ff9800;height:100%;border-radius:2px;width:0'></div></div>",
+      "      </div>",
+      "    </div>",
+      "    <div id='ai' class='mt-8 text-sm text-center' style='font-family:monospace;color:#81d4fa;opacity:0'>\"All systems are functioning within normal parameters, sir.\"</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#header', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
+      "animation.stagger('#p{i}', 3, { opacity: [0, 1], translateY: [15, 0] }, { start: 0.3, stagger: 0.3, duration: 0.3, easing: 'easeOut' });",
+      "animation.counter('#n0', [0, 100], { start: 0.5, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#b0', { width: [0, 100, '%'] }, { start: 0.5, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#n1', [0, 98], { start: 0.8, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#b1', { width: [0, 98, '%'] }, { start: 0.8, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#n2', [0, 85], { start: 1.1, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#b2', { width: [0, 85, '%'] }, { start: 1.1, end: 2.5, easing: 'easeOut' });",
+      "animation.animate('#ai', { opacity: [0, 1] }, { start: 3.5, end: 4.0 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Closing Beat — Suit Up / Hero Reveal
+
+Arc reactor flares, title scales in with glow.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative' style='background:#0a0e1a'>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div id='glow' style='width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.3),transparent);opacity:0'></div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='core' class='mb-8' style='width:0;height:0;background:#4fc3f7;border-radius:50%;box-shadow:0 0 30px #4fc3f7,0 0 60px rgba(79,195,247,0.4);opacity:0'></div>",
+      "    <div id='title' class='text-7xl font-bold tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#4fc3f7;opacity:0;text-shadow:0 0 40px rgba(79,195,247,0.4)'>TITLE</div>",
+      "    <div id='tagline' class='text-xl mt-6 tracking-[0.3em]' style='font-family:monospace;color:#81d4fa;opacity:0'>SUIT UP</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#glow', { opacity: [0, 0.5], width: [0, 600, 'px'], height: [0, 600, 'px'] }, { start: 0, end: 2.0, easing: 'easeOut' });",
+      "animation.animate('#core', { opacity: [0, 1], width: [0, 20, 'px'], height: [0, 20, 'px'] }, { start: 0.3, end: 1.0, easing: 'easeOut' });",
+      "animation.animate('#title', { opacity: [0, 1], scale: [1.2, 1] }, { start: 1.0, end: 2.0, easing: 'easeOut' });",
+      "animation.animate('#tagline', { opacity: [0, 1] }, { start: 2.5, end: 3.0 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+---
+
 ## Custom Theme Guidelines
 
 ### 1. Define visual identity
@@ -1369,6 +2207,11 @@ Each theme needs ONE distinctive visual element present in most beats:
 | Documentary | None (clean, minimal is the signature) |
 | Anime | Speed lines (`repeating-conic-gradient`) |
 | Horror | Red vignette (`radial-gradient`) |
+| Terminator | Red scan grid + targeting reticle |
+| DB Scouter | Concentric scouter rings (green circles) |
+| Blade Runner | Neon rain (colored vertical streaks) |
+| Total Recall | Glitch distortion bands (horizontal offset) |
+| JARVIS | Arc reactor rings (concentric blue circles + glow) |
 
 ### 3. Create beat templates (minimum 3)
 
@@ -1391,12 +2234,15 @@ Each theme needs ONE distinctive visual element present in most beats:
 
 | BGM | Mood | Best themes |
 |-----|------|-------------|
-| theme001.mp3 | Epic orchestral | Space Opera, Mecha |
-| story001.mp3 | Smooth piano | Film Noir, Mystery |
-| story002.mp3 | Techno, inspiring | Cyberpunk |
-| story004.mp3 | Classical ambient | Documentary |
+| theme001.mp3 | Epic orchestral | Space Opera, Mecha, DB Scouter |
+| story001.mp3 | Smooth piano | Film Noir, Blade Runner |
+| story002.mp3 | Techno, inspiring | Cyberpunk, Total Recall, JARVIS |
+| story003.mp3 | Piano, inspiring | JARVIS |
+| story004.mp3 | Classical ambient | Documentary, Blade Runner |
 | story005.mp3 | Piano solo | Documentary, Elegant |
 | vibe001.mp3 | Dance, energetic | Anime, Action |
+| llm001.mp3 | Electronic | Terminator, Matrix |
+| olympic001.mp3 | Epic fanfare | DB Scouter, Anime |
 | classical001.mp3 | Classical | Mecha, Documentary |
 | llm001.mp3 | Electronic | Matrix, Cyberpunk |
 | Piano Horror (Mixkit) | Horror piano | Horror, Thriller |
