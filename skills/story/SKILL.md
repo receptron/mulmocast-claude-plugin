@@ -216,6 +216,8 @@ For beats that benefit from motion — cinematic intros, opening crawls, data vi
 
 **Read** `references/html_animation_reference.md` at the plugin root for the full API reference (MulmoAnimation DSL, interpolate, Easing, property types).
 
+For cinematic theme recipes (Star Wars, cyberpunk, mecha anime, film noir, synthwave, Matrix, documentary, anime opening, horror), **Read** `references/cinematic_patterns.md`.
+
 #### When to use animation
 
 | Content Type | Visual Mode |

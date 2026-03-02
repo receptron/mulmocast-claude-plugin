@@ -86,6 +86,17 @@ Upload a video file to YouTube. Automatically detects Shorts-eligible videos (ve
 /mulmocast:youtube-upload output/my-video/my-video_ja.mp4 "動画タイトル"
 ```
 
+## References
+
+The `references/` directory contains design guides for the `/mulmocast:story` skill:
+
+| Reference | Description |
+|-----------|-------------|
+| `slide_dsl_reference.md` | Slide DSL layout and block specifications |
+| `slide_patterns.md` | Design pattern examples (dense slides, charts, mermaid) |
+| `html_animation_reference.md` | MulmoAnimation DSL API reference |
+| `cinematic_patterns.md` | Cinematic theme recipes — 9 themes: Space Opera, Cyberpunk, Mecha Anime, Film Noir, Retro Synthwave, Matrix, Documentary, Anime Opening, Horror. Includes external BGM URLs (Mixkit, Incompetech) |
+
 ## Installation
 
 ### Step 1: Add marketplace
