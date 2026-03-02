@@ -122,6 +122,17 @@ Create a stroke order animation video using KanjiVG data. Supports hiragana, kat
 /mulmocast:stroke-order あいうえお
 ```
 
+## References
+
+The `references/` directory contains design guides for the `/mulmocast:story` skill:
+
+| Reference | Description |
+|-----------|-------------|
+| `slide_dsl_reference.md` | Slide DSL layout and block specifications |
+| `slide_patterns.md` | Design pattern examples (dense slides, charts, mermaid) |
+| `html_animation_reference.md` | MulmoAnimation DSL API reference |
+| `cinematic_patterns.md` | Cinematic theme recipes — 14 themes: Space Opera, Cyberpunk, Mecha Anime, Film Noir, Retro Synthwave, Matrix, Documentary, Anime Opening, Horror, Terminator T-800, Dragon Ball Scouter, Blade Runner, Total Recall, Iron Man JARVIS. Includes external BGM URLs (Mixkit, Incompetech) |
+
 ## Installation
 
 ### Step 1: Add marketplace

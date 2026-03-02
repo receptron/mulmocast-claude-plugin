@@ -216,6 +216,10 @@ For beats that benefit from motion — cinematic intros, opening crawls, data vi
 
 **Read** `references/html_animation_reference.md` at the plugin root for the full API reference (MulmoAnimation DSL, interpolate, Easing, property types).
 
+For cinematic theme recipes (Star Wars, cyberpunk, mecha anime, film noir, synthwave, Matrix, documentary, anime opening, horror, Terminator, Dragon Ball scouter, Blade Runner, Total Recall, JARVIS), **Read** `references/cinematic_patterns.md`.
+
+For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD overlay on photos), see the "Image Animation Patterns" section in `references/html_animation_reference.md`. Key rules: variable must be named `animation`, wrap `<img>` in `<div>` for transforms, use `file://` absolute paths.
+
 #### When to use animation
 
 | Content Type | Visual Mode |

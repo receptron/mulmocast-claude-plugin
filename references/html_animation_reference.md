@@ -95,3 +95,90 @@ animation.blink(selector, { interval? })  // interval: half-cycle seconds (defau
 - `end: 'auto'` uses the beat's total duration (`totalFrames / fps`) as the end time
 - CSS animations/transitions are disabled in the template (deterministic frame rendering)
 - All elements that will be animated should have initial styles set inline (e.g., `style='opacity:0'`)
+
+## Image Animation Patterns
+
+Embed real images (`<img>`) inside animated html_tailwind beats. Sample script: `scripts/samples/image_animation_showcase.json`
+
+### Critical Rules
+
+1. **Variable name must be `animation`** — the auto-render system checks `typeof animation !== 'undefined'`. Using `const a = ...` will silently fail (no animation).
+2. **Wrap images in a `<div>` for transforms** — animate the wrapper, not the `<img>` directly. `object-fit:cover` on `<img>` conflicts with `scale`/`translate` transforms.
+3. **Use `file://` absolute paths** — Puppeteer loads HTML via `setContent` (origin `about:blank`), so relative paths won't resolve. `file://` URLs trigger temp-file loading via `page.goto`.
+
+### Pattern: Ken Burns (zoom + pan)
+
+```json
+"html": [
+  "<div class='h-full w-full overflow-hidden relative bg-black'>",
+  "  <div id='photo_wrap' style='position:absolute;inset:0;overflow:hidden'>",
+  "    <img src='file:///absolute/path/to/image.png' style='width:100%;height:100%;object-fit:cover' />",
+  "  </div>",
+  "</div>"
+],
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.animate('#photo_wrap', { scale: [1.0, 1.2], translateX: [0, -30, 'px'] }, { start: 0, end: 'auto', easing: 'linear' });"
+]
+```
+
+### Pattern: Image + Text Overlay
+
+Image as background, text panel slides in over a gradient scrim.
+
+```json
+"html": [
+  "<div class='h-full w-full relative bg-black'>",
+  "  <img src='file:///path/to/image.png' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover' />",
+  "  <div style='position:absolute;inset:0;background:linear-gradient(to right, rgba(0,0,0,0.75), transparent)'></div>",
+  "  <div id='panel' style='opacity:0;position:absolute;left:0;top:0;bottom:0;width:45%;display:flex;flex-direction:column;justify-content:center;padding:0 48px'>",
+  "    <h2 id='h2' style='opacity:0;color:white;font-size:36px'>Title</h2>",
+  "  </div>",
+  "</div>"
+],
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.animate('#panel', { opacity: [0,1], translateX: [-60,0,'px'] }, { start: 0.3, end: 1.0, easing: 'easeOut' });",
+  "animation.animate('#h2', { opacity: [0,1], translateY: [20,0] }, { start: 0.6, end: 1.2, easing: 'easeOut' });"
+]
+```
+
+### Pattern: Image Carousel (cross-fade)
+
+Wrap each image in a `<div id='w{i}'>`, cross-fade with `opacity`.
+
+```json
+"html": [
+  "<div class='h-full w-full relative bg-black overflow-hidden'>",
+  "  <div id='w0' style='position:absolute;inset:0'><img src='file:///path/img1.png' style='width:100%;height:100%;object-fit:cover' /></div>",
+  "  <div id='w1' style='position:absolute;inset:0;opacity:0'><img src='file:///path/img2.png' style='width:100%;height:100%;object-fit:cover' /></div>",
+  "</div>"
+],
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.animate('#w0', { scale: [1.0, 1.1] }, { start: 0, end: 2.0 });",
+  "animation.animate('#w0', { opacity: [1, 0] }, { start: 1.6, end: 2.2 });",
+  "animation.animate('#w1', { opacity: [0, 1] }, { start: 1.6, end: 2.2 });",
+  "animation.animate('#w1', { scale: [1.05, 1.0] }, { start: 2.0, end: 'auto' });"
+]
+```
+
+### Pattern: HUD Overlay on Photo
+
+Image as background with CSS-drawn brackets, counters, scan lines.
+
+```json
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.animate('#scan', { translateY: [0, 720, 'px'] }, { start: 0, end: 2.0, easing: 'linear' });",
+  "animation.stagger('#b{i}', 4, { opacity: [0,1], scale: [1.6,1.0] }, { start: 1.5, stagger: 0.15, duration: 0.5 });",
+  "animation.counter('#ct', [0, 3], { start: 2.5, end: 4.0, decimals: 0 });"
+]
+```
+
+### Other Patterns
+
+- **Split reveal**: Two images with `stagger('#s{i}', 2, ...)` entrance
+- **Zoom spotlight**: Wrapper scales up + vignette overlay fades in + callout ring
+- **Parallax layers**: Background/mid/front at different `translateX` speeds
+- **Morphing grid**: 2×2 grid with `stagger('#g{i}', 4, ...)` scale-in
