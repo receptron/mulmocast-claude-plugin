@@ -218,7 +218,7 @@ For beats that benefit from motion — cinematic intros, opening crawls, data vi
 
 For cinematic theme recipes (Star Wars, cyberpunk, mecha anime, film noir, synthwave, Matrix, documentary, anime opening, horror, Terminator, Dragon Ball scouter, Blade Runner, Total Recall, JARVIS), **Read** `references/cinematic_patterns.md`.
 
-For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD overlay on photos), see the "Image Animation Patterns" section in `references/html_animation_reference.md`. Key rules: variable must be named `animation`, wrap `<img>` in `<div>` for transforms, use `file://` absolute paths.
+For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD overlay on photos), see the "Image Animation Patterns" section in `references/html_animation_reference.md`. Key rules: variable must be named `animation`, wrap `<img>` in `<div>` for transforms, use relative paths from the script file (automatically resolved to `file://` at render time).
 
 #### When to use animation
 
@@ -234,7 +234,6 @@ For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD ov
 
 ```json
 {
-  "duration": 3,
   "image": {
     "type": "html_tailwind",
     "html": ["<div id='el' style='opacity:0'>...</div>"],
@@ -251,7 +250,7 @@ Key rules:
 - `html`: HTML markup with Tailwind CSS (no `<script>` tags). Set initial styles inline (e.g., `style='opacity:0'`)
 - `script`: JavaScript code (no `<script>` tags). Use `MulmoAnimation` DSL or raw `render()` + `interpolate()`
 - `animation`: `true` (30fps) or `{ "fps": 15 }` for custom fps
-- `duration`: Required for animated beats (may be auto-calculated from audio)
+- **Do NOT set `duration`** — it is auto-calculated from the audio length. Setting it explicitly causes audio/video desync. Only set `duration` for silent beats or fixed-length intros.
 - Name the MulmoAnimation instance `animation` to enable auto-render (no manual `render()` needed)
 - Use `end: 'auto'` for animations that span the entire beat duration
 
