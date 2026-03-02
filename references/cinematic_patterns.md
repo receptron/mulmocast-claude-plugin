@@ -1343,6 +1343,8 @@ Text slowly appears letter by letter, as if being uncovered.
 
 ---
 
+> **HUD Overlay Themes (10-14)**: These themes create scene environments using CSS-generated backgrounds (city skylines, landscapes, atmospheric layers) with HUD elements overlaid — matching how these movies render their CG. For photorealistic backgrounds, generate a scene image with `imagePrompt` in `imageParams.images` and use it as a CSS `background-image` in the html_tailwind beat.
+
 ## Theme 10: Terminator T-800 Vision
 
 **Mood**: Mechanical, threatening, cold machine intelligence
@@ -1362,7 +1364,8 @@ Text slowly appears letter by letter, as if being uncovered.
 
 | Element | Value |
 |---------|-------|
-| Background | `background:#1a0000` (dark red-black) |
+| Background scene | City silhouette skyline (procedural buildings + window lights) over red gradient sky |
+| Background color | `background:linear-gradient(180deg,#1a0000,#0d0000 60%,#1a0505)` |
 | Primary color | `color:#ff0000` (HUD red — targeting, borders, text) |
 | Secondary color | `color:#ff3333` (lighter red — labels, secondary text) |
 | Data color | `color:#ff6666` (soft red — counters, readouts) |
@@ -1371,71 +1374,29 @@ Text slowly appears letter by letter, as if being uncovered.
 | Borders | `border:1px solid #660000` |
 | Panel background | `rgba(255,0,0,0.05)` |
 
-### Signature element — Red Scan Grid
+### Signature element — City Scene + Targeting Brackets
 
-HUD targeting grid overlay with crosshair:
+City silhouette with red HUD overlay. Buildings generated procedurally; targeting brackets (L-shaped corners) lock onto subjects.
 
+**City skyline generator** (script):
+```javascript
+"var city=document.getElementById('city');",
+"[[3,6,55],[9,4,80],[14,8,45],[23,5,92],[29,10,35],[40,6,72],[48,4,55],[53,7,88],[62,5,48],[69,8,65],[79,4,78],[85,6,40],[92,5,70]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#'+(i%2?'0a':'0d')+'0000;border-top:1px solid rgba(255,0,0,0.08)';city.appendChild(d);for(var w=0;w<4;w++){var l=document.createElement('div');l.style.cssText='position:absolute;bottom:'+((0.1+Math.abs(Math.sin((i*7+w*13)*17.3))*0.6)*b[2])+'%;left:'+(b[0]+Math.abs(Math.sin((i*11+w*23)*31.7))*b[1]*0.6+b[1]*0.2)+'%;width:3px;height:2px;background:rgba(255,50,50,'+(0.12+Math.abs(Math.sin(i+w))*0.15)+')';city.appendChild(l);}});"
+```
+
+**Targeting brackets** (html — L-shaped corners that animate from large→focused):
 ```html
-<div class='absolute inset-0 pointer-events-none'>
-  <div style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>
-  <div style='position:absolute;top:50%;left:50%;width:80px;height:80px;transform:translate(-50%,-50%);border:2px solid rgba(255,0,0,0.4);border-radius:50%'></div>
-  <div style='position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,0,0,0.08)'></div>
-  <div style='position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,0,0,0.08)'></div>
+<div id='bracket' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;opacity:0'>
+  <div style='position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #ff0000;border-left:2px solid #ff0000'></div>
+  <div style='position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #ff0000;border-right:2px solid #ff0000'></div>
+  <div style='position:absolute;bottom:0;left:0;width:20px;height:20px;border-bottom:2px solid #ff0000;border-left:2px solid #ff0000'></div>
+  <div style='position:absolute;bottom:0;right:0;width:20px;height:20px;border-bottom:2px solid #ff0000;border-right:2px solid #ff0000'></div>
 </div>
 ```
 
 ### Opening Beat — System Boot / Target Acquired
 
-Red HUD boots up with scan lines, targeting reticle pulses, status text appears.
-
-```json
-{
-  "duration": 4,
-  "image": {
-    "type": "html_tailwind",
-    "html": [
-      "<div class='h-full w-full relative' style='background:#1a0000'>",
-      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>",
-      "  <div id='reticle' class='absolute' style='top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%);border:2px solid #ff0000;border-radius:50%;opacity:0'></div>",
-      "  <div id='hline' class='absolute' style='top:50%;left:0;right:0;height:1px;background:#ff0000;opacity:0'></div>",
-      "  <div id='vline' class='absolute' style='left:50%;top:0;bottom:0;width:1px;background:#ff0000;opacity:0'></div>",
-      "  <div class='absolute top-8 left-8'>",
-      "    <div id='sys' class='text-xs tracking-[0.3em]' style='font-family:monospace;color:#ff3333;opacity:0'>CYBERDYNE SYSTEMS MODEL 101</div>",
-      "    <div id='mode' class='text-xs mt-1' style='font-family:monospace;color:#660000;opacity:0'>SCAN MODE: ACTIVE</div>",
-      "  </div>",
-      "  <div class='absolute bottom-8 right-8 text-right'>",
-      "    <div id='dist' class='text-xs' style='font-family:monospace;color:#ff6666;opacity:0'>DIST: <span id='distVal'></span>m</div>",
-      "    <div id='threat' class='text-xs mt-1' style='font-family:monospace;color:#ff0000;opacity:0'>THREAT: <span id='threatVal'></span>%</div>",
-      "  </div>",
-      "  <div class='h-full flex flex-col items-center justify-center relative'>",
-      "    <div id='target' class='text-5xl font-bold tracking-wider' style='font-family:monospace;color:#ff0000;opacity:0'>TARGET ACQUIRED</div>",
-      "    <div id='id' class='text-lg mt-4 tracking-[0.5em]' style='font-family:monospace;color:#ff3333;opacity:0'>SUBJECT IDENTIFIED</div>",
-      "  </div>",
-      "</div>"
-    ],
-    "script": [
-      "const animation = new MulmoAnimation();",
-      "animation.animate('#reticle', { opacity: [0, 0.6], width: [0, 120, 'px'], height: [0, 120, 'px'] }, { start: 0, end: 1.0, easing: 'easeOut' });",
-      "animation.animate('#hline', { opacity: [0, 0.15] }, { start: 0, end: 0.3 });",
-      "animation.animate('#vline', { opacity: [0, 0.15] }, { start: 0, end: 0.3 });",
-      "animation.animate('#sys', { opacity: [0, 1] }, { start: 0.2, end: 0.4 });",
-      "animation.animate('#mode', { opacity: [0, 1] }, { start: 0.5, end: 0.7 });",
-      "animation.blink('#mode', { interval: 0.8 });",
-      "animation.animate('#dist', { opacity: [0, 1] }, { start: 0.8, end: 1.0 });",
-      "animation.counter('#distVal', [250, 12], { start: 0.8, end: 3.0, decimals: 1 });",
-      "animation.animate('#threat', { opacity: [0, 1] }, { start: 1.0, end: 1.2 });",
-      "animation.counter('#threatVal', [0, 97], { start: 1.0, end: 2.5, decimals: 0 });",
-      "animation.animate('#target', { opacity: [0, 1] }, { start: 1.5, end: 1.8 });",
-      "animation.animate('#id', { opacity: [0, 1] }, { start: 2.0, end: 2.3 });"
-    ],
-    "animation": true
-  }
-}
-```
-
-### Feature Beat — Analysis HUD
-
-Multi-zone data display: status bars, counters, blinking alerts.
+City skyline background, targeting brackets lock on, HUD data streams in, scan line sweeps down.
 
 ```json
 {
@@ -1443,48 +1404,115 @@ Multi-zone data display: status bars, counters, blinking alerts.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#1a0000'>",
-      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>",
-      "  <div class='h-full flex flex-col justify-center px-16 relative'>",
-      "    <div id='header' class='text-xs tracking-[0.5em] mb-8' style='font-family:monospace;color:#ff3333;opacity:0'>TACTICAL ANALYSIS</div>",
-      "    <div class='flex gap-8'>",
-      "      <div class='flex-1'>",
-      "        <div id='r0' class='mb-6' style='opacity:0'>",
-      "          <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>POWER CELL</span><span id='v0'></span></div>",
-      "          <div style='background:#330000;height:6px;border-radius:2px'><div id='bar0' style='background:#ff0000;height:100%;border-radius:2px;width:0'></div></div>",
-      "        </div>",
-      "        <div id='r1' class='mb-6' style='opacity:0'>",
-      "          <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>NEURAL NET</span><span id='v1'></span></div>",
-      "          <div style='background:#330000;height:6px;border-radius:2px'><div id='bar1' style='background:#ff3333;height:100%;border-radius:2px;width:0'></div></div>",
-      "        </div>",
-      "        <div id='r2' class='mb-6' style='opacity:0'>",
-      "          <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>TARGETING</span><span id='v2'></span></div>",
-      "          <div style='background:#330000;height:6px;border-radius:2px'><div id='bar2' style='background:#ff0000;height:100%;border-radius:2px;width:0'></div></div>",
-      "        </div>",
-      "      </div>",
-      "      <div class='flex-1'>",
-      "        <div id='info0' class='text-sm mb-3' style='font-family:monospace;color:#ff3333;opacity:0'>▸ Primary objective: ACTIVE</div>",
-      "        <div id='info1' class='text-sm mb-3' style='font-family:monospace;color:#ff3333;opacity:0'>▸ Weapons system: ONLINE</div>",
-      "        <div id='info2' class='text-sm mb-3' style='font-family:monospace;color:#ff3333;opacity:0'>▸ Threat analysis: PROCESSING</div>",
-      "        <div id='warn' class='text-sm mt-6 font-bold' style='font-family:monospace;color:#ff0000;opacity:0'>⚠ ELEVATED THREAT LEVEL</div>",
-      "      </div>",
-      "    </div>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#1a0000,#0d0000 60%,#1a0505)'>",
+      "  <div id='city' class='absolute bottom-0 left-0 right-0' style='height:70%'></div>",
+      "  <div class='absolute inset-0' style='background:rgba(255,0,0,0.04)'></div>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.04) 38px,rgba(255,0,0,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.04) 38px,rgba(255,0,0,0.04) 40px)'></div>",
+      "  <div id='scanline' class='absolute left-0 right-0' style='height:2px;background:rgba(255,0,0,0.2);top:0;opacity:0'></div>",
+      "  <div id='bracket' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;opacity:0'>",
+      "    <div style='position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #ff0000;border-left:2px solid #ff0000'></div>",
+      "    <div style='position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #ff0000;border-right:2px solid #ff0000'></div>",
+      "    <div style='position:absolute;bottom:0;left:0;width:20px;height:20px;border-bottom:2px solid #ff0000;border-left:2px solid #ff0000'></div>",
+      "    <div style='position:absolute;bottom:0;right:0;width:20px;height:20px;border-bottom:2px solid #ff0000;border-right:2px solid #ff0000'></div>",
+      "  </div>",
+      "  <div class='absolute top-6 left-8'>",
+      "    <div id='sys' class='text-xs tracking-[0.3em]' style='font-family:monospace;color:#ff3333;opacity:0'>CYBERDYNE SYSTEMS MODEL 101</div>",
+      "    <div id='mode' class='text-xs mt-1' style='font-family:monospace;color:#660000;opacity:0'>SCAN MODE: ACTIVE</div>",
+      "  </div>",
+      "  <div class='absolute top-6 right-8 text-right'>",
+      "    <div id='time' class='text-xs' style='font-family:monospace;color:#660000;opacity:0'>03:27:41 PM</div>",
+      "  </div>",
+      "  <div class='absolute bottom-6 left-8'>",
+      "    <div id='dist' class='text-xs' style='font-family:monospace;color:#ff6666;opacity:0'>DIST: <span id='distVal'></span>m</div>",
+      "  </div>",
+      "  <div class='absolute bottom-6 right-8 text-right'>",
+      "    <div id='threat' class='text-xs' style='font-family:monospace;color:#ff0000;opacity:0'>THREAT: <span id='threatVal'></span>%</div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "    <div id='target' class='text-5xl font-bold tracking-wider' style='font-family:monospace;color:#ff0000;opacity:0'>TARGET ACQUIRED</div>",
+      "    <div id='id' class='text-lg mt-4 tracking-[0.5em]' style='font-family:monospace;color:#ff3333;opacity:0'>MATCH: <span id='matchVal'></span>%</div>",
       "  </div>",
       "</div>"
     ],
     "script": [
+      "var city=document.getElementById('city');",
+      "[[3,6,55],[9,4,80],[14,8,45],[23,5,92],[29,10,35],[40,6,72],[48,4,55],[53,7,88],[62,5,48],[69,8,65],[79,4,78],[85,6,40],[92,5,70]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#'+(i%2?'0a':'0d')+'0000;border-top:1px solid rgba(255,0,0,0.08)';city.appendChild(d);for(var w=0;w<4;w++){var l=document.createElement('div');l.style.cssText='position:absolute;bottom:'+((0.1+Math.abs(Math.sin((i*7+w*13)*17.3))*0.6)*b[2])+'%;left:'+(b[0]+Math.abs(Math.sin((i*11+w*23)*31.7))*b[1]*0.6+b[1]*0.2)+'%;width:3px;height:2px;background:rgba(255,50,50,'+(0.12+Math.abs(Math.sin(i+w))*0.15)+')';city.appendChild(l);}});",
       "const animation = new MulmoAnimation();",
+      "animation.animate('#scanline', { opacity: [0, 0.2], translateY: [0, 720] }, { start: 0, end: 2.0 });",
+      "animation.animate('#bracket', { opacity: [0, 1], width: [320, 160, 'px'], height: [260, 130, 'px'] }, { start: 0.5, end: 1.8, easing: 'easeOut' });",
+      "animation.animate('#sys', { opacity: [0, 1] }, { start: 0.2, end: 0.4 });",
+      "animation.animate('#mode', { opacity: [0, 1] }, { start: 0.5, end: 0.7 });",
+      "animation.blink('#mode', { interval: 0.8 });",
+      "animation.animate('#time', { opacity: [0, 1] }, { start: 0.3, end: 0.5 });",
+      "animation.animate('#dist', { opacity: [0, 1] }, { start: 1.0, end: 1.2 });",
+      "animation.counter('#distVal', [250, 12], { start: 1.0, end: 3.5, decimals: 1 });",
+      "animation.animate('#threat', { opacity: [0, 1] }, { start: 1.2, end: 1.4 });",
+      "animation.counter('#threatVal', [0, 97], { start: 1.2, end: 3.0, decimals: 0 });",
+      "animation.animate('#target', { opacity: [0, 1] }, { start: 2.0, end: 2.3 });",
+      "animation.animate('#id', { opacity: [0, 1] }, { start: 2.5, end: 2.8 });",
+      "animation.counter('#matchVal', [0, 99.7], { start: 2.5, end: 3.5, decimals: 1 });"
+    ],
+    "animation": true
+  }
+}
+```
+
+### Feature Beat — Subject Analysis HUD
+
+Person silhouette with face recognition wireframe dots and analysis data overlay on city scene.
+
+```json
+{
+  "duration": 5,
+  "image": {
+    "type": "html_tailwind",
+    "html": [
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#1a0000,#0d0000 60%,#1a0505)'>",
+      "  <div id='city' class='absolute bottom-0 left-0 right-0' style='height:70%'></div>",
+      "  <div class='absolute inset-0' style='background:rgba(255,0,0,0.04)'></div>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.04) 38px,rgba(255,0,0,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.04) 38px,rgba(255,0,0,0.04) 40px)'></div>",
+      "  <div id='silhouette' class='absolute' style='top:12%;left:30%;width:25%;height:78%;opacity:0'>",
+      "    <div style='position:absolute;top:0;left:25%;width:50%;height:18%;border:1px solid rgba(255,0,0,0.25);border-radius:50%'></div>",
+      "    <div style='position:absolute;top:16%;left:15%;width:70%;height:30%;border:1px solid rgba(255,0,0,0.15);border-radius:30% 30% 5% 5%'></div>",
+      "    <div style='position:absolute;top:44%;left:5%;width:35%;height:56%;border:1px solid rgba(255,0,0,0.1);border-radius:5%'></div>",
+      "    <div style='position:absolute;top:44%;right:5%;width:35%;height:56%;border:1px solid rgba(255,0,0,0.1);border-radius:5%'></div>",
+      "    <div id='faceGrid' class='absolute' style='top:1%;left:28%;width:44%;height:15%'></div>",
+      "  </div>",
+      "  <div class='absolute top-6 left-8'>",
+      "    <div id='header' class='text-xs tracking-[0.5em]' style='font-family:monospace;color:#ff3333;opacity:0'>SUBJECT ANALYSIS</div>",
+      "  </div>",
+      "  <div class='absolute top-16 right-8 w-72'>",
+      "    <div id='r0' class='mb-4' style='opacity:0'>",
+      "      <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>WEAPON SCAN</span><span style='color:#ff0000'>HANDGUN</span></div>",
+      "      <div style='background:#330000;height:4px;border-radius:2px'><div id='bar0' style='background:#ff0000;height:100%;border-radius:2px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='r1' class='mb-4' style='opacity:0'>",
+      "      <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>BEHAVIOR</span><span style='color:#ff3333'>HOSTILE</span></div>",
+      "      <div style='background:#330000;height:4px;border-radius:2px'><div id='bar1' style='background:#ff3333;height:100%;border-radius:2px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='r2' class='mb-4' style='opacity:0'>",
+      "      <div class='flex justify-between text-xs mb-1' style='font-family:monospace;color:#ff6666'><span>NEURAL NET</span><span id='nVal' style='color:#ff6666'></span></div>",
+      "      <div style='background:#330000;height:4px;border-radius:2px'><div id='bar2' style='background:#ff6666;height:100%;border-radius:2px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='action' class='text-sm font-bold mt-6' style='font-family:monospace;color:#ff0000;opacity:0'>▸ ACTION: TERMINATE</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "script": [
+      "var city=document.getElementById('city');",
+      "[[3,6,55],[9,4,80],[14,8,45],[23,5,92],[29,10,35],[40,6,72],[48,4,55],[53,7,88],[62,5,48],[69,8,65],[79,4,78],[85,6,40],[92,5,70]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#'+(i%2?'0a':'0d')+'0000';city.appendChild(d);});",
+      "var fg=document.getElementById('faceGrid');for(var i=0;i<15;i++){var dot=document.createElement('div');dot.style.cssText='position:absolute;width:3px;height:3px;border-radius:50%;background:#ff0000;opacity:0;left:'+(Math.abs(Math.sin(i*37.7))*80+10)+'%;top:'+(Math.abs(Math.sin(i*53.1))*80+10)+'%';dot.id='dot'+i;fg.appendChild(dot);}",
+      "const animation = new MulmoAnimation();",
+      "animation.animate('#silhouette', { opacity: [0, 1] }, { start: 0, end: 0.5 });",
+      "animation.stagger('#dot{i}', 15, { opacity: [0, 0.8] }, { start: 0.3, stagger: 0.06, duration: 0.1 });",
       "animation.animate('#header', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
-      "animation.stagger('#r{i}', 3, { opacity: [0, 1] }, { start: 0.3, stagger: 0.3, duration: 0.2 });",
-      "animation.counter('#v0', [0, 87], { start: 0.5, end: 2.5, suffix: '%', decimals: 0 });",
-      "animation.animate('#bar0', { width: [0, 87, '%'] }, { start: 0.5, end: 2.5, easing: 'easeOut' });",
-      "animation.counter('#v1', [0, 100], { start: 0.8, end: 2.5, suffix: '%', decimals: 0 });",
-      "animation.animate('#bar1', { width: [0, 100, '%'] }, { start: 0.8, end: 2.5, easing: 'easeOut' });",
-      "animation.counter('#v2', [0, 94], { start: 1.1, end: 2.5, suffix: '%', decimals: 0 });",
-      "animation.animate('#bar2', { width: [0, 94, '%'] }, { start: 1.1, end: 2.5, easing: 'easeOut' });",
-      "animation.stagger('#info{i}', 3, { opacity: [0, 1], translateX: [-10, 0] }, { start: 1.5, stagger: 0.4, duration: 0.25, easing: 'easeOut' });",
-      "animation.animate('#warn', { opacity: [0, 1] }, { start: 3.5, end: 3.8 });",
-      "animation.blink('#warn', { interval: 0.4 });"
+      "animation.stagger('#r{i}', 3, { opacity: [0, 1] }, { start: 0.8, stagger: 0.4, duration: 0.25 });",
+      "animation.animate('#bar0', { width: [0, 92, '%'] }, { start: 1.0, end: 2.5, easing: 'easeOut' });",
+      "animation.animate('#bar1', { width: [0, 88, '%'] }, { start: 1.4, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#nVal', [0, 100], { start: 1.8, end: 2.8, suffix: '%', decimals: 0 });",
+      "animation.animate('#bar2', { width: [0, 100, '%'] }, { start: 1.8, end: 2.8, easing: 'easeOut' });",
+      "animation.animate('#action', { opacity: [0, 1] }, { start: 3.5, end: 3.8 });",
+      "animation.blink('#action', { interval: 0.4 });"
     ],
     "animation": true
   }
@@ -1493,7 +1521,7 @@ Multi-zone data display: status bars, counters, blinking alerts.
 
 ### Closing Beat — Mission Status
 
-Full-screen mission result with data counters.
+City backdrop darkens, mission result overlay.
 
 ```json
 {
@@ -1501,8 +1529,10 @@ Full-screen mission result with data counters.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#1a0000'>",
-      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.06) 38px,rgba(255,0,0,0.06) 40px)'></div>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#1a0000,#0d0000 60%,#1a0505)'>",
+      "  <div id='city' class='absolute bottom-0 left-0 right-0' style='height:70%'></div>",
+      "  <div class='absolute inset-0' style='background:rgba(255,0,0,0.06)'></div>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,0,0,0.04) 38px,rgba(255,0,0,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,0,0,0.04) 38px,rgba(255,0,0,0.04) 40px)'></div>",
       "  <div class='h-full flex flex-col items-center justify-center relative'>",
       "    <div id='status' class='text-6xl font-bold tracking-wider' style='font-family:monospace;color:#ff0000;opacity:0'>MISSION COMPLETE</div>",
       "    <div id='line' class='mt-6 h-px' style='background:#ff0000;opacity:0;width:0'></div>",
@@ -1511,6 +1541,8 @@ Full-screen mission result with data counters.
       "</div>"
     ],
     "script": [
+      "var city=document.getElementById('city');",
+      "[[3,6,55],[9,4,80],[14,8,45],[23,5,92],[29,10,35],[40,6,72],[48,4,55],[53,7,88],[62,5,48],[69,8,65],[79,4,78],[85,6,40],[92,5,70]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#'+(i%2?'0a':'0d')+'0000';city.appendChild(d);});",
       "const animation = new MulmoAnimation();",
       "animation.animate('#status', { opacity: [0, 1] }, { start: 0.5, end: 1.0 });",
       "animation.animate('#line', { opacity: [0, 0.6], width: [0, 500, 'px'] }, { start: 1.0, end: 2.0, easing: 'easeOut' });",
@@ -1543,7 +1575,8 @@ Full-screen mission result with data counters.
 
 | Element | Value |
 |---------|-------|
-| Background | `background:#001a00` (dark green-black, scouter lens tint) |
+| Background scene | Warrior silhouette (CSS clip-path figure) viewed through green scouter lens with circular frame |
+| Background color | `background:radial-gradient(circle at center,#002200,#001a00 40%,#000d00)` |
 | Primary color | `color:#00ff66` (scouter green — readouts, borders) |
 | Secondary color | `color:#00cc44` (darker green — labels, secondary text) |
 | Alert color | `color:#ff3300` (red — danger, power overflow) |
@@ -1552,21 +1585,30 @@ Full-screen mission result with data counters.
 | Font — labels | `font-family:Impact,'Arial Black',sans-serif` (bold power display) |
 | Borders | `border:2px solid rgba(0,255,102,0.3)` |
 
-### Signature element — Scouter Frame
+### Signature element — Scouter Lens + Warrior Silhouette
 
-Circular lens frame with scan sweep:
+Circular lens frame with tick marks overlaid on a warrior silhouette target. The scouter view shows what the user is looking AT through the lens.
 
+**Warrior silhouette** (html — CSS clip-path figure):
 ```html
-<div class='absolute inset-0 pointer-events-none'>
-  <div style='position:absolute;top:50%;left:50%;width:500px;height:500px;transform:translate(-50%,-50%);border:3px solid rgba(0,255,102,0.2);border-radius:50%'></div>
-  <div style='position:absolute;top:50%;left:50%;width:350px;height:350px;transform:translate(-50%,-50%);border:1px solid rgba(0,255,102,0.1);border-radius:50%'></div>
-  <div style='position:absolute;top:50%;left:50%;width:200px;height:200px;transform:translate(-50%,-50%);border:1px solid rgba(0,255,102,0.08);border-radius:50%'></div>
+<div id='warrior' class='absolute' style='top:15%;left:32%;width:36%;height:75%;opacity:0'>
+  <div style='width:100%;height:100%;background:linear-gradient(180deg,rgba(0,255,102,0.12),rgba(0,255,102,0.03));clip-path:polygon(40% 0%,60% 0%,65% 10%,60% 25%,75% 35%,80% 50%,70% 65%,60% 100%,40% 100%,30% 65%,20% 50%,25% 35%,40% 25%,35% 10%)'></div>
+</div>
+```
+
+**Scouter lens frame** (html — circle with directional tick marks):
+```html
+<div id='lens' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border:3px solid rgba(0,255,102,0.3);border-radius:50%;opacity:0'>
+  <div style='position:absolute;top:-8px;left:50%;width:2px;height:15px;background:rgba(0,255,102,0.4);transform:translateX(-50%)'></div>
+  <div style='position:absolute;bottom:-8px;left:50%;width:2px;height:15px;background:rgba(0,255,102,0.4);transform:translateX(-50%)'></div>
+  <div style='position:absolute;left:-8px;top:50%;width:15px;height:2px;background:rgba(0,255,102,0.4);transform:translateY(-50%)'></div>
+  <div style='position:absolute;right:-8px;top:50%;width:15px;height:2px;background:rgba(0,255,102,0.4);transform:translateY(-50%)'></div>
 </div>
 ```
 
 ### Opening Beat — Power Level Scan
 
-Scouter activates, scans target, power level counter races upward.
+Warrior silhouette appears through scouter lens, power level counter races upward, alert on overload.
 
 ```json
 {
@@ -1574,18 +1616,27 @@ Scouter activates, scans target, power level counter races upward.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#001a00'>",
-      "  <div class='absolute inset-0 pointer-events-none'>",
-      "    <div id='ring1' style='position:absolute;top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%);border:3px solid rgba(0,255,102,0.3);border-radius:50%;opacity:0'></div>",
-      "    <div id='ring2' style='position:absolute;top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%);border:1px solid rgba(0,255,102,0.15);border-radius:50%;opacity:0'></div>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:radial-gradient(circle at center,#002200,#001a00 40%,#000d00)'>",
+      "  <div id='warrior' class='absolute' style='top:15%;left:32%;width:36%;height:75%;opacity:0'>",
+      "    <div style='width:100%;height:100%;background:linear-gradient(180deg,rgba(0,255,102,0.12),rgba(0,255,102,0.03));clip-path:polygon(40% 0%,60% 0%,65% 10%,60% 25%,75% 35%,80% 50%,70% 65%,60% 100%,40% 100%,30% 65%,20% 50%,25% 35%,40% 25%,35% 10%)'></div>",
       "  </div>",
+      "  <div id='lens' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border:3px solid rgba(0,255,102,0.3);border-radius:50%;opacity:0'>",
+      "    <div style='position:absolute;top:-8px;left:50%;width:2px;height:15px;background:rgba(0,255,102,0.4);transform:translateX(-50%)'></div>",
+      "    <div style='position:absolute;bottom:-8px;left:50%;width:2px;height:15px;background:rgba(0,255,102,0.4);transform:translateX(-50%)'></div>",
+      "    <div style='position:absolute;left:-8px;top:50%;width:15px;height:2px;background:rgba(0,255,102,0.4);transform:translateY(-50%)'></div>",
+      "    <div style='position:absolute;right:-8px;top:50%;width:15px;height:2px;background:rgba(0,255,102,0.4);transform:translateY(-50%)'></div>",
+      "  </div>",
+      "  <div id='ring2' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border:1px solid rgba(0,255,102,0.12);border-radius:50%;opacity:0'></div>",
       "  <div class='absolute top-6 left-8'>",
       "    <div id='scouter' class='text-xs tracking-[0.3em]' style='font-family:monospace;color:#00cc44;opacity:0'>SCOUTER v3.0 — ACTIVE</div>",
       "  </div>",
       "  <div class='absolute top-6 right-8 text-right'>",
       "    <div id='scanLabel' class='text-xs' style='font-family:monospace;color:#004d1a;opacity:0'>SCANNING...</div>",
       "  </div>",
-      "  <div class='h-full flex flex-col items-center justify-center relative'>",
+      "  <div class='absolute bottom-6 left-8'>",
+      "    <div id='species' class='text-xs' style='font-family:monospace;color:#00cc44;opacity:0'>SPECIES: SAIYAN</div>",
+      "  </div>",
+      "  <div class='h-full flex flex-col items-center justify-center relative' style='padding-top:20%'>",
       "    <div id='label' class='text-sm tracking-[0.5em] mb-4' style='font-family:monospace;color:#00cc44;opacity:0'>戦 闘 力</div>",
       "    <div id='power' class='font-bold' style='font-family:Impact,\"Arial Black\",sans-serif;color:#00ff66;font-size:120px'></div>",
       "    <div id='alert' class='text-xl mt-6 font-bold tracking-wider' style='font-family:monospace;color:#ff3300;opacity:0'>!!! OVER 9000 !!!</div>",
@@ -1594,13 +1645,15 @@ Scouter activates, scans target, power level counter races upward.
     ],
     "script": [
       "const animation = new MulmoAnimation();",
-      "animation.animate('#ring1', { opacity: [0, 0.5], width: [0, 500, 'px'], height: [0, 500, 'px'] }, { start: 0, end: 1.5, easing: 'easeOut' });",
-      "animation.animate('#ring2', { opacity: [0, 0.3], width: [0, 350, 'px'], height: [0, 350, 'px'] }, { start: 0.3, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#warrior', { opacity: [0, 1] }, { start: 0, end: 0.8 });",
+      "animation.animate('#lens', { opacity: [0, 0.6], width: [0, 550, 'px'], height: [0, 550, 'px'] }, { start: 0.2, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#ring2', { opacity: [0, 0.2], width: [0, 400, 'px'], height: [0, 400, 'px'] }, { start: 0.5, end: 1.5, easing: 'easeOut' });",
       "animation.animate('#scouter', { opacity: [0, 1] }, { start: 0.2, end: 0.4 });",
       "animation.animate('#scanLabel', { opacity: [0, 1] }, { start: 0.3, end: 0.5 });",
       "animation.blink('#scanLabel', { interval: 0.3 });",
-      "animation.animate('#label', { opacity: [0, 1] }, { start: 0.5, end: 0.8 });",
-      "animation.counter('#power', [0, 9001], { start: 0.8, end: 3.5, decimals: 0 });",
+      "animation.animate('#species', { opacity: [0, 1] }, { start: 0.6, end: 0.8 });",
+      "animation.animate('#label', { opacity: [0, 1] }, { start: 0.8, end: 1.1 });",
+      "animation.counter('#power', [0, 9001], { start: 1.0, end: 3.5, decimals: 0 });",
       "animation.animate('#alert', { opacity: [0, 1] }, { start: 3.5, end: 3.8 });",
       "animation.blink('#alert', { interval: 0.25 });"
     ],
@@ -1611,7 +1664,7 @@ Scouter activates, scans target, power level counter races upward.
 
 ### Feature Beat — Multi-Target Analysis
 
-Grid of targets with individual power levels and status indicators.
+Multiple warrior silhouettes at different positions, each with individual power level readout and status.
 
 ```json
 {
@@ -1619,34 +1672,39 @@ Grid of targets with individual power levels and status indicators.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#001a00'>",
-      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 58px,rgba(0,255,102,0.04) 58px,rgba(0,255,102,0.04) 60px),repeating-linear-gradient(90deg,transparent,transparent 58px,rgba(0,255,102,0.04) 58px,rgba(0,255,102,0.04) 60px)'></div>",
-      "  <div class='h-full flex flex-col justify-center px-16 relative'>",
-      "    <div id='header' class='text-xs tracking-[0.5em] mb-8' style='font-family:monospace;color:#00cc44;opacity:0'>TARGET ANALYSIS</div>",
-      "    <div class='grid grid-cols-3 gap-6'>",
-      "      <div id='t0' class='p-5 text-center' style='border:2px solid rgba(0,255,102,0.3);background:rgba(0,255,102,0.03);opacity:0'>",
-      "        <div class='text-xs tracking-widest mb-2' style='font-family:monospace;color:#00cc44'>TARGET A</div>",
-      "        <div id='p0' class='text-4xl font-bold' style='font-family:Impact,sans-serif;color:#00ff66'></div>",
-      "        <div class='text-xs mt-2' style='font-family:monospace;color:#004d1a'>STATUS: NORMAL</div>",
-      "      </div>",
-      "      <div id='t1' class='p-5 text-center' style='border:2px solid rgba(0,255,102,0.3);background:rgba(0,255,102,0.03);opacity:0'>",
-      "        <div class='text-xs tracking-widest mb-2' style='font-family:monospace;color:#00cc44'>TARGET B</div>",
-      "        <div id='p1' class='text-4xl font-bold' style='font-family:Impact,sans-serif;color:#00ff66'></div>",
-      "        <div class='text-xs mt-2' style='font-family:monospace;color:#004d1a'>STATUS: ELEVATED</div>",
-      "      </div>",
-      "      <div id='t2' class='p-5 text-center' style='border:2px solid rgba(255,51,0,0.4);background:rgba(255,51,0,0.05);opacity:0'>",
-      "        <div class='text-xs tracking-widest mb-2' style='font-family:monospace;color:#ff3300'>TARGET C</div>",
-      "        <div id='p2' class='text-4xl font-bold' style='font-family:Impact,sans-serif;color:#ff3300'></div>",
-      "        <div id='danger' class='text-xs mt-2 font-bold' style='font-family:monospace;color:#ff3300'>⚠ DANGER</div>",
-      "      </div>",
-      "    </div>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:radial-gradient(circle at center,#002200,#001a00 40%,#000d00)'>",
+      "  <div class='absolute' style='top:20%;left:8%;width:18%;height:60%;opacity:0.5'>",
+      "    <div style='width:100%;height:100%;background:rgba(0,255,102,0.06);clip-path:polygon(40% 0%,60% 0%,65% 15%,75% 35%,70% 65%,60% 100%,40% 100%,30% 65%,25% 35%,35% 15%)'></div>",
+      "  </div>",
+      "  <div class='absolute' style='top:10%;left:38%;width:22%;height:72%;opacity:0.5'>",
+      "    <div style='width:100%;height:100%;background:rgba(0,255,102,0.08);clip-path:polygon(40% 0%,60% 0%,65% 15%,75% 35%,70% 65%,60% 100%,40% 100%,30% 65%,25% 35%,35% 15%)'></div>",
+      "  </div>",
+      "  <div class='absolute' style='top:25%;left:70%;width:16%;height:55%;opacity:0.5'>",
+      "    <div style='width:100%;height:100%;background:rgba(255,51,0,0.08);clip-path:polygon(40% 0%,60% 0%,65% 15%,75% 35%,70% 65%,60% 100%,40% 100%,30% 65%,25% 35%,35% 15%)'></div>",
+      "  </div>",
+      "  <div class='absolute inset-0' style='background:repeating-linear-gradient(0deg,transparent,transparent 58px,rgba(0,255,102,0.03) 58px,rgba(0,255,102,0.03) 60px),repeating-linear-gradient(90deg,transparent,transparent 58px,rgba(0,255,102,0.03) 58px,rgba(0,255,102,0.03) 60px)'></div>",
+      "  <div id='header' class='absolute top-6 left-8 text-xs tracking-[0.5em]' style='font-family:monospace;color:#00cc44;opacity:0'>MULTI-TARGET SCAN</div>",
+      "  <div id='t0' class='absolute p-3' style='top:15%;left:5%;border:1px solid rgba(0,255,102,0.3);background:rgba(0,20,0,0.7);opacity:0'>",
+      "    <div class='text-xs tracking-widest mb-1' style='font-family:monospace;color:#00cc44'>TARGET A</div>",
+      "    <div id='p0' class='text-3xl font-bold' style='font-family:Impact,sans-serif;color:#00ff66'></div>",
+      "    <div class='text-xs mt-1' style='font-family:monospace;color:#004d1a'>NORMAL</div>",
+      "  </div>",
+      "  <div id='t1' class='absolute p-3' style='top:5%;left:36%;border:1px solid rgba(0,255,102,0.3);background:rgba(0,20,0,0.7);opacity:0'>",
+      "    <div class='text-xs tracking-widest mb-1' style='font-family:monospace;color:#00cc44'>TARGET B</div>",
+      "    <div id='p1' class='text-3xl font-bold' style='font-family:Impact,sans-serif;color:#00ff66'></div>",
+      "    <div class='text-xs mt-1' style='font-family:monospace;color:#00cc44'>ELEVATED</div>",
+      "  </div>",
+      "  <div id='t2' class='absolute p-3' style='top:20%;left:68%;border:1px solid rgba(255,51,0,0.4);background:rgba(20,0,0,0.7);opacity:0'>",
+      "    <div class='text-xs tracking-widest mb-1' style='font-family:monospace;color:#ff3300'>TARGET C</div>",
+      "    <div id='p2' class='text-3xl font-bold' style='font-family:Impact,sans-serif;color:#ff3300'></div>",
+      "    <div id='danger' class='text-xs mt-1 font-bold' style='font-family:monospace;color:#ff3300'>⚠ DANGER</div>",
       "  </div>",
       "</div>"
     ],
     "script": [
       "const animation = new MulmoAnimation();",
       "animation.animate('#header', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
-      "animation.stagger('#t{i}', 3, { opacity: [0, 1], translateY: [15, 0] }, { start: 0.3, stagger: 0.4, duration: 0.3, easing: 'easeOut' });",
+      "animation.stagger('#t{i}', 3, { opacity: [0, 1], translateY: [10, 0] }, { start: 0.3, stagger: 0.4, duration: 0.3, easing: 'easeOut' });",
       "animation.counter('#p0', [0, 1200], { start: 0.5, end: 2.5, decimals: 0 });",
       "animation.counter('#p1', [0, 4500], { start: 0.9, end: 2.5, decimals: 0 });",
       "animation.counter('#p2', [0, 53000], { start: 1.3, end: 3.0, decimals: 0 });",
@@ -1659,7 +1717,7 @@ Grid of targets with individual power levels and status indicators.
 
 ### Closing Beat — Scouter Explosion
 
-Power level overloads — screen cracks/flashes. The counter runs to overflow, then red flash.
+Power overload with warrior silhouette background — counter races to overflow, red flash (scouter explodes).
 
 ```json
 {
@@ -1667,8 +1725,14 @@ Power level overloads — screen cracks/flashes. The counter runs to overflow, t
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#001a00'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:radial-gradient(circle at center,#002200,#001a00 40%,#000d00)'>",
+      "  <div class='absolute' style='top:15%;left:32%;width:36%;height:75%;opacity:0.3'>",
+      "    <div style='width:100%;height:100%;background:rgba(0,255,102,0.06);clip-path:polygon(40% 0%,60% 0%,65% 10%,60% 25%,75% 35%,80% 50%,70% 65%,60% 100%,40% 100%,30% 65%,20% 50%,25% 35%,40% 25%,35% 10%)'></div>",
+      "  </div>",
       "  <div id='flash' class='absolute inset-0' style='background:#ff3300;opacity:0'></div>",
+      "  <div id='crack1' class='absolute' style='top:20%;left:30%;width:40%;height:1px;background:#ff3300;opacity:0;transform:rotate(25deg)'></div>",
+      "  <div id='crack2' class='absolute' style='top:50%;left:20%;width:55%;height:1px;background:#ff3300;opacity:0;transform:rotate(-15deg)'></div>",
+      "  <div id='crack3' class='absolute' style='top:70%;left:35%;width:35%;height:1px;background:#00ff66;opacity:0;transform:rotate(10deg)'></div>",
       "  <div class='h-full flex flex-col items-center justify-center relative'>",
       "    <div id='label' class='text-sm tracking-[0.5em] mb-4' style='font-family:monospace;color:#00cc44;opacity:0'>戦 闘 力</div>",
       "    <div id='power' class='font-bold' style='font-family:Impact,\"Arial Black\",sans-serif;color:#00ff66;font-size:100px'></div>",
@@ -1680,6 +1744,9 @@ Power level overloads — screen cracks/flashes. The counter runs to overflow, t
       "const animation = new MulmoAnimation();",
       "animation.animate('#label', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
       "animation.counter('#power', [0, 999999], { start: 0.3, end: 2.5, decimals: 0 });",
+      "animation.animate('#crack1', { opacity: [0, 0.6] }, { start: 2.3, end: 2.4 });",
+      "animation.animate('#crack2', { opacity: [0, 0.5] }, { start: 2.4, end: 2.5 });",
+      "animation.animate('#crack3', { opacity: [0, 0.4] }, { start: 2.5, end: 2.6 });",
       "animation.animate('#flash', { opacity: [0, 0.6] }, { start: 2.5, end: 2.7 });",
       "animation.animate('#flash', { opacity: [0.6, 0] }, { start: 2.7, end: 3.0 });",
       "animation.animate('#error', { opacity: [0, 1] }, { start: 2.8, end: 3.1 });",
@@ -1712,7 +1779,8 @@ Power level overloads — screen cracks/flashes. The counter runs to overflow, t
 
 | Element | Value |
 |---------|-------|
-| Background | `background:#0a0a14` (deep blue-black) |
+| Background scene | Multi-layered urban cityscape (far/mid/close building silhouettes), neon signs, multi-depth rain, fog layers |
+| Background color | `background:linear-gradient(180deg,#0a0a14,#0f0f1e 40%,#141428)` |
 | Primary color | `color:#ff6a00` (neon orange — accents, highlights) |
 | Secondary color | `color:#00b4d8` (teal/cyan — UI elements, text) |
 | Warm accent | `color:#e76f51` (warm orange-red — emphasis) |
@@ -1721,27 +1789,22 @@ Power level overloads — screen cracks/flashes. The counter runs to overflow, t
 | Font — UI/labels | `font-family:'Courier New',Monaco,monospace` |
 | Borders | `border:1px solid #1a1a2e` |
 
-### Signature element — Neon Rain
+### Signature element — Layered Cityscape + Neon Rain
 
-Vertical rain streaks with neon glow:
+Multi-depth building silhouettes with neon sign boxes, window lights, and 80+ rain drops at varying speeds and colors. Fog gradient at street level.
 
+**City + rain generator** (script):
 ```javascript
-"var rain = document.getElementById('rain');",
-"for (var i = 0; i < 60; i++) {",
-"  var d = document.createElement('div');",
-"  var x = (Math.sin(i*311.7)*0.5+0.5)*100;",
-"  var h = (Math.sin(i*127.1)*0.5+0.5)*30+10;",
-"  var op = (Math.sin(i*43.1)*0.5+0.5)*0.3+0.05;",
-"  var colors = ['#00b4d8','#ff6a00','#e76f51'];",
-"  var c = colors[Math.floor(Math.abs(Math.sin(i*73.3))*3)];",
-"  d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,'+c+');opacity:'+op;",
-"  d.id='drop'+i; rain.appendChild(d);",
-"}"
+"var bg=document.getElementById('bg-layer');",
+"[[0,15,30],[18,12,50],[35,10,25],[50,14,55],[68,10,35],[82,15,45],[95,5,30]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:rgba(15,15,30,0.7)';bg.appendChild(d);});",
+"var mid=document.getElementById('mid-layer');var nC=['#ff6a00','#00b4d8','#e76f51','#00b4d8','#ff6a00','#e76f51','#00b4d8'];",
+"[[5,8,60],[18,6,75],[30,10,50],[44,7,85],[58,8,65],[72,6,55],[84,8,70],[93,5,45]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#0a0a14;border-top:1px solid rgba(0,180,216,0.05)';mid.appendChild(d);if(i%2===0){var s=document.createElement('div');var nc=nC[i%7];s.style.cssText='position:absolute;bottom:'+(b[2]*0.35)+'%;left:'+(b[0]+b[1]*0.1)+'%;width:'+(b[1]*0.8)+'%;height:6px;background:'+nc+';box-shadow:0 0 8px '+nc+',0 0 20px '+nc+';opacity:0.35';mid.appendChild(s);}for(var w=0;w<5;w++){var l=document.createElement('div');l.style.cssText='position:absolute;bottom:'+(b[2]*(0.1+Math.abs(Math.sin(i*13+w*7))*0.7))+'%;left:'+(b[0]+b[1]*(0.1+Math.abs(Math.sin(i*17+w*11))*0.7))+'%;width:4px;height:3px;background:rgba(255,200,100,'+(0.06+Math.abs(Math.sin(i*w))*0.08)+')';mid.appendChild(l);}});",
+"var rain=document.getElementById('rain');for(var i=0;i<80;i++){var d=document.createElement('div');var x=(Math.sin(i*311.7)*0.5+0.5)*100;var h=(Math.sin(i*127.1)*0.5+0.5)*35+10;var op=(Math.sin(i*43.1)*0.5+0.5)*0.2+0.05;var colors=['#00b4d8','#ff6a00','#e76f51'];var c=colors[Math.floor(Math.abs(Math.sin(i*73.3))*3)];d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,'+c+');opacity:'+op;d.id='drop'+i;rain.appendChild(d);}"
 ```
 
 ### Opening Beat — Rain City Title
 
-Title fades in over falling rain. Slow, melancholic.
+Multi-layered cityscape with neon signs, falling rain at multiple depths, title emerging through the haze.
 
 ```json
 {
@@ -1749,20 +1812,26 @@ Title fades in over falling rain. Slow, melancholic.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0a14'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#0a0a14,#0f0f1e 40%,#141428)'>",
+      "  <div id='bg-layer' class='absolute bottom-0 left-0 right-0' style='height:75%'></div>",
+      "  <div id='mid-layer' class='absolute bottom-0 left-0 right-0' style='height:85%'></div>",
+      "  <div class='absolute bottom-0 left-0 right-0 h-32' style='background:linear-gradient(0deg,rgba(255,106,0,0.06),transparent)'></div>",
+      "  <div class='absolute bottom-0 left-0 right-0 h-24' style='background:linear-gradient(0deg,rgba(10,10,20,0.6),transparent)'></div>",
       "  <div id='rain' class='absolute inset-0'></div>",
-      "  <div class='absolute bottom-0 left-0 right-0 h-16' style='background:linear-gradient(0deg,rgba(255,106,0,0.08),transparent)'></div>",
       "  <div class='h-full flex flex-col items-center justify-center relative'>",
-      "    <div id='title' class='text-7xl font-bold tracking-wider text-center' style='font-family:Georgia,serif;color:#ff6a00;opacity:0;text-shadow:0 0 30px rgba(255,106,0,0.3)'>TITLE</div>",
+      "    <div id='title' class='text-7xl font-bold tracking-wider text-center' style='font-family:Georgia,serif;color:#ff6a00;opacity:0;text-shadow:0 0 40px rgba(255,106,0,0.4),0 0 80px rgba(255,106,0,0.1)'>TITLE</div>",
       "    <div id='subtitle' class='text-xl mt-6 tracking-[0.3em]' style='font-family:\"Courier New\",monospace;color:#00b4d8;opacity:0'>Like tears in rain</div>",
       "  </div>",
       "</div>"
     ],
     "script": [
-      "var rain = document.getElementById('rain');",
-      "for (var i = 0; i < 60; i++) { var d = document.createElement('div'); var x = (Math.sin(i*311.7)*0.5+0.5)*100; var h = (Math.sin(i*127.1)*0.5+0.5)*30+10; var op = (Math.sin(i*43.1)*0.5+0.5)*0.3+0.05; var colors = ['#00b4d8','#ff6a00','#e76f51']; var c = colors[Math.floor(Math.abs(Math.sin(i*73.3))*3)]; d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,'+c+');opacity:'+op; d.id='drop'+i; rain.appendChild(d); }",
+      "var bg=document.getElementById('bg-layer');",
+      "[[0,15,30],[18,12,50],[35,10,25],[50,14,55],[68,10,35],[82,15,45],[95,5,30]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:rgba(15,15,30,0.7)';bg.appendChild(d);});",
+      "var mid=document.getElementById('mid-layer');var nC=['#ff6a00','#00b4d8','#e76f51','#00b4d8','#ff6a00','#e76f51','#00b4d8'];",
+      "[[5,8,60],[18,6,75],[30,10,50],[44,7,85],[58,8,65],[72,6,55],[84,8,70],[93,5,45]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#0a0a14;border-top:1px solid rgba(0,180,216,0.05)';mid.appendChild(d);if(i%2===0){var s=document.createElement('div');var nc=nC[i%7];s.style.cssText='position:absolute;bottom:'+(b[2]*0.35)+'%;left:'+(b[0]+b[1]*0.1)+'%;width:'+(b[1]*0.8)+'%;height:6px;background:'+nc+';box-shadow:0 0 8px '+nc+',0 0 20px '+nc+';opacity:0.35';mid.appendChild(s);}for(var w=0;w<5;w++){var l=document.createElement('div');l.style.cssText='position:absolute;bottom:'+(b[2]*(0.1+Math.abs(Math.sin(i*13+w*7))*0.7))+'%;left:'+(b[0]+b[1]*(0.1+Math.abs(Math.sin(i*17+w*11))*0.7))+'%;width:4px;height:3px;background:rgba(255,200,100,'+(0.06+Math.abs(Math.sin(i*w))*0.08)+')';mid.appendChild(l);}});",
+      "var rain=document.getElementById('rain');for(var i=0;i<80;i++){var d=document.createElement('div');var x=(Math.sin(i*311.7)*0.5+0.5)*100;var h=(Math.sin(i*127.1)*0.5+0.5)*35+10;var op=(Math.sin(i*43.1)*0.5+0.5)*0.2+0.05;var colors=['#00b4d8','#ff6a00','#e76f51'];var c=colors[Math.floor(Math.abs(Math.sin(i*73.3))*3)];d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,'+c+');opacity:'+op;d.id='drop'+i;rain.appendChild(d);}",
       "const animation = new MulmoAnimation();",
-      "for (var k = 0; k < 60; k++) { var spd = (Math.sin(k*43.7)*0.5+0.5)*1.5+0.5; animation.animate('#drop'+k, { translateY: [0, 800] }, { start: spd*0.3, end: 'auto' }); }",
+      "for(var k=0;k<80;k++){var spd=(Math.sin(k*43.7)*0.5+0.5)*1.5+0.5;animation.animate('#drop'+k,{translateY:[0,800]},{start:spd*0.3,end:'auto'});}",
       "animation.animate('#title', { opacity: [0, 1] }, { start: 1.0, end: 2.5 });",
       "animation.animate('#subtitle', { opacity: [0, 0.7] }, { start: 3.0, end: 4.5 });"
     ],
@@ -1773,7 +1842,7 @@ Title fades in over falling rain. Slow, melancholic.
 
 ### Feature Beat — Voight-Kampff Terminal
 
-Retro analysis terminal with blinking cursor, result data.
+Retro analysis terminal over subtle cityscape background with blinking cursor and result data.
 
 ```json
 {
@@ -1781,11 +1850,14 @@ Retro analysis terminal with blinking cursor, result data.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0a0a14'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#0a0a14,#0f0f1e 40%,#141428)'>",
+      "  <div id='bg-layer' class='absolute bottom-0 left-0 right-0' style='height:75%'></div>",
+      "  <div class='absolute inset-0' style='background:rgba(10,10,20,0.7)'></div>",
       "  <div class='absolute inset-0 pointer-events-none' style='background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,180,216,0.02) 3px,rgba(0,180,216,0.02) 4px)'></div>",
+      "  <div id='rain' class='absolute inset-0'></div>",
       "  <div class='h-full flex flex-col justify-center px-20 relative'>",
       "    <div id='label' class='text-xs tracking-[0.5em] mb-6' style='font-family:monospace;color:#ff6a00;opacity:0'>VOIGHT-KAMPFF ANALYSIS v6.2</div>",
-      "    <div class='p-6 rounded' style='border:1px solid #1a1a2e;background:rgba(10,10,20,0.8)'>",
+      "    <div class='p-6 rounded' style='border:1px solid #1a1a2e;background:rgba(10,10,20,0.85)'>",
       "      <div id='q' class='text-lg mb-4' style='font-family:Georgia,serif;color:#00b4d8'></div>",
       "      <div id='cur' style='font-family:monospace;color:#00b4d8'>&#9608;</div>",
       "      <div class='mt-6 pt-4' style='border-top:1px solid #1a1a2e'>",
@@ -1799,7 +1871,10 @@ Retro analysis terminal with blinking cursor, result data.
       "</div>"
     ],
     "script": [
+      "var bg=document.getElementById('bg-layer');[[0,15,30],[18,12,50],[35,10,25],[50,14,55],[68,10,35],[82,15,45]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:rgba(15,15,30,0.5)';bg.appendChild(d);});",
+      "var rain=document.getElementById('rain');for(var i=0;i<30;i++){var d=document.createElement('div');d.style.cssText='position:absolute;top:-'+(Math.sin(i*127)*10+15)+'px;left:'+(Math.sin(i*311.7)*50+50)+'%;width:1px;height:'+(Math.sin(i*127)*10+15)+'px;background:linear-gradient(180deg,transparent,#00b4d8);opacity:'+(Math.sin(i*43)*0.08+0.05);d.id='drop'+i;rain.appendChild(d);}",
       "const animation = new MulmoAnimation();",
+      "for(var k=0;k<30;k++){animation.animate('#drop'+k,{translateY:[0,800]},{start:(Math.sin(k*43.7)*0.5+0.5)*1.5,end:'auto'});}",
       "animation.animate('#label', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
       "animation.typewriter('#q', 'Describe in single words only the good things that come into your mind about your mother.', { start: 0.3, end: 2.5 });",
       "animation.blink('#cur', { interval: 0.35 });",
@@ -1816,7 +1891,7 @@ Retro analysis terminal with blinking cursor, result data.
 
 ### Closing Beat — Tears in Rain
 
-Iconic monologue quote fading slowly on rain backdrop.
+Quote fading slowly over rain-soaked cityscape backdrop.
 
 ```json
 {
@@ -1824,7 +1899,10 @@ Iconic monologue quote fading slowly on rain backdrop.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0a14'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#0a0a14,#0f0f1e 40%,#141428)'>",
+      "  <div id='bg-layer' class='absolute bottom-0 left-0 right-0' style='height:75%'></div>",
+      "  <div id='mid-layer' class='absolute bottom-0 left-0 right-0' style='height:85%'></div>",
+      "  <div class='absolute bottom-0 left-0 right-0 h-32' style='background:linear-gradient(0deg,rgba(255,106,0,0.04),transparent)'></div>",
       "  <div id='rain' class='absolute inset-0'></div>",
       "  <div class='h-full flex flex-col items-center justify-center relative px-24'>",
       "    <div id='quote' class='text-3xl italic leading-relaxed text-center' style='font-family:Georgia,serif;color:#00b4d8;opacity:0'>\"All those moments will be lost in time, like tears in rain.\"</div>",
@@ -1834,10 +1912,11 @@ Iconic monologue quote fading slowly on rain backdrop.
       "</div>"
     ],
     "script": [
-      "var rain = document.getElementById('rain');",
-      "for (var i = 0; i < 40; i++) { var d = document.createElement('div'); var x = (Math.sin(i*311.7)*0.5+0.5)*100; var h = (Math.sin(i*127.1)*0.5+0.5)*20+8; d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,#00b4d8);opacity:'+(Math.sin(i*43.1)*0.1+0.1); d.id='drop'+i; rain.appendChild(d); }",
+      "var bg=document.getElementById('bg-layer');[[0,15,30],[18,12,50],[35,10,25],[50,14,55],[68,10,35],[82,15,45],[95,5,30]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:rgba(15,15,30,0.7)';bg.appendChild(d);});",
+      "var mid=document.getElementById('mid-layer');var nC=['#ff6a00','#00b4d8','#e76f51'];[[5,8,60],[30,10,50],[58,8,65],[84,8,70]].forEach(function(b,i){var d=document.createElement('div');d.style.cssText='position:absolute;bottom:0;left:'+b[0]+'%;width:'+b[1]+'%;height:'+b[2]+'%;background:#0a0a14';mid.appendChild(d);var s=document.createElement('div');var nc=nC[i%3];s.style.cssText='position:absolute;bottom:'+(b[2]*0.4)+'%;left:'+(b[0]+b[1]*0.15)+'%;width:'+(b[1]*0.7)+'%;height:5px;background:'+nc+';box-shadow:0 0 8px '+nc+';opacity:0.25';mid.appendChild(s);});",
+      "var rain=document.getElementById('rain');for(var i=0;i<50;i++){var d=document.createElement('div');var x=(Math.sin(i*311.7)*0.5+0.5)*100;var h=(Math.sin(i*127.1)*0.5+0.5)*25+8;d.style.cssText='position:absolute;top:-'+h+'px;left:'+x+'%;width:1px;height:'+h+'px;background:linear-gradient(180deg,transparent,#00b4d8);opacity:'+(Math.sin(i*43.1)*0.08+0.06);d.id='drop'+i;rain.appendChild(d);}",
       "const animation = new MulmoAnimation();",
-      "for (var k = 0; k < 40; k++) { animation.animate('#drop'+k, { translateY: [0, 800] }, { start: (Math.sin(k*43.7)*0.5+0.5)*1.0, end: 'auto' }); }",
+      "for(var k=0;k<50;k++){animation.animate('#drop'+k,{translateY:[0,800]},{start:(Math.sin(k*43.7)*0.5+0.5)*1.0,end:'auto'});}",
       "animation.animate('#quote', { opacity: [0, 1] }, { start: 0.5, end: 2.5 });",
       "animation.animate('#line', { opacity: [0, 0.5], width: [0, 400, 'px'] }, { start: 2.5, end: 3.5, easing: 'easeOut' });",
       "animation.animate('#label', { opacity: [0, 0.5] }, { start: 3.5, end: 4.5 });"
@@ -1868,7 +1947,8 @@ Iconic monologue quote fading slowly on rain backdrop.
 
 | Element | Value |
 |---------|-------|
-| Background | `background:#0d0000` (dark with red-mars tint) |
+| Background scene | Mars landscape gradient with dome silhouettes on horizon; brain/head outline with neural scan visualization |
+| Background color | `background:linear-gradient(180deg,#1a0800,#331000 40%,#442200 70%,#331005)` (Mars atmosphere) |
 | Primary color | `color:#ff4444` (Rekall red — UI, borders, headings) |
 | Secondary color | `color:#00ccaa` (teal/green — memory data, holographic) |
 | Glitch | `color:#ffffff` (white — flashes, reality breaks) |
@@ -1876,21 +1956,27 @@ Iconic monologue quote fading slowly on rain backdrop.
 | Font — headings | `font-family:'Arial Black',Impact,sans-serif` |
 | Font — data/UI | `font-family:'Courier New',Monaco,monospace` |
 
-### Signature element — Glitch / Memory Distortion
+### Signature element — Mars Scene + Brain Scan + Glitch
 
-Horizontal offset bands that simulate a glitched signal:
+Mars landscape background with dome structures, brain/head silhouette outline, neural network dots, and horizontal glitch bands for reality distortion.
 
+**Mars domes generator** (script):
+```javascript
+"var mars=document.getElementById('mars');",
+"[[8,12],[22,8],[40,15],[65,10],[80,6]].forEach(function(d,i){var dome=document.createElement('div');dome.style.cssText='position:absolute;bottom:0;left:'+d[0]+'%;width:'+d[1]+'%;height:'+(d[1]*0.6)+'%;background:rgba(50,20,10,0.5);border-radius:50% 50% 0 0;border-top:1px solid rgba(255,68,68,0.1)';mars.appendChild(dome);});"
+```
+
+**Brain silhouette** (html):
 ```html
-<div class='absolute inset-0 pointer-events-none overflow-hidden'>
-  <div id='glitch1' style='position:absolute;top:30%;left:-5px;right:0;height:3px;background:#ff4444;opacity:0'></div>
-  <div id='glitch2' style='position:absolute;top:60%;left:0;right:-5px;height:2px;background:#00ccaa;opacity:0'></div>
-  <div id='glitch3' style='position:absolute;top:75%;left:-3px;right:0;height:4px;background:#ffffff;opacity:0'></div>
+<div id='brain' class='absolute' style='top:15%;left:30%;width:40%;height:50%;opacity:0'>
+  <div style='width:100%;height:100%;border:1px solid rgba(0,204,170,0.2);border-radius:45% 45% 40% 40%'></div>
+  <div id='neurons'></div>
 </div>
 ```
 
 ### Opening Beat — Rekall Memory Implant Start
 
-Memory implant UI boots up with progress counter and reality glitch.
+Mars landscape background, brain outline with scanning beam, neural dots lighting up, memory implant progress.
 
 ```json
 {
@@ -1898,27 +1984,40 @@ Memory implant UI boots up with progress counter and reality glitch.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0d0000'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#1a0800,#331000 40%,#442200 70%,#331005)'>",
+      "  <div id='mars' class='absolute bottom-0 left-0 right-0' style='height:30%'></div>",
+      "  <div class='absolute bottom-0 left-0 right-0 h-16' style='background:linear-gradient(0deg,rgba(50,20,10,0.3),transparent)'></div>",
+      "  <div id='brain' class='absolute' style='top:10%;left:30%;width:40%;height:45%;opacity:0'>",
+      "    <div style='width:100%;height:100%;border:1px solid rgba(0,204,170,0.15);border-radius:45% 45% 40% 40%'></div>",
+      "    <div style='position:absolute;top:15%;left:10%;width:80%;height:60%;border:1px dashed rgba(0,204,170,0.08);border-radius:40%'></div>",
+      "    <div id='neurons'></div>",
+      "  </div>",
+      "  <div id='scanBeam' class='absolute' style='top:10%;left:30%;width:40%;height:1px;background:linear-gradient(90deg,transparent,#00ccaa,transparent);opacity:0'></div>",
       "  <div id='g1' class='absolute' style='top:25%;left:-5px;right:0;height:3px;background:#ff4444;opacity:0'></div>",
       "  <div id='g2' class='absolute' style='top:65%;left:0;right:-3px;height:2px;background:#00ccaa;opacity:0'></div>",
-      "  <div class='h-full flex flex-col items-center justify-center relative'>",
-      "    <div id='logo' class='text-sm tracking-[0.5em] mb-8' style='font-family:monospace;color:#ff4444;opacity:0'>R E K A L L   I N C.</div>",
-      "    <div id='title' class='text-6xl font-bold tracking-wider' style='font-family:\"Arial Black\",Impact,sans-serif;color:#ff4444;opacity:0'>MEMORY IMPLANT</div>",
-      "    <div class='mt-10 w-96'>",
+      "  <div class='h-full flex flex-col items-center justify-center relative' style='padding-top:40%'>",
+      "    <div id='logo' class='text-sm tracking-[0.5em] mb-6' style='font-family:monospace;color:#ff4444;opacity:0'>R E K A L L   I N C.</div>",
+      "    <div id='title' class='text-5xl font-bold tracking-wider' style='font-family:\"Arial Black\",Impact,sans-serif;color:#ff4444;opacity:0'>MEMORY IMPLANT</div>",
+      "    <div class='mt-8 w-80'>",
       "      <div class='flex justify-between text-xs mb-2' style='font-family:monospace'><span id='status' style='color:#553333;opacity:0'>INITIALIZING...</span><span id='pct' style='color:#ff4444'></span></div>",
       "      <div style='background:#330000;height:8px;border-radius:4px'><div id='bar' style='background:linear-gradient(90deg,#ff4444,#00ccaa);height:100%;border-radius:4px;width:0'></div></div>",
       "    </div>",
-      "    <div id='warn' class='text-sm mt-8 tracking-wider' style='font-family:monospace;color:#00ccaa;opacity:0'>DO NOT ATTEMPT TO RESIST</div>",
+      "    <div id='warn' class='text-sm mt-6 tracking-wider' style='font-family:monospace;color:#00ccaa;opacity:0'>DO NOT ATTEMPT TO RESIST</div>",
       "  </div>",
       "</div>"
     ],
     "script": [
+      "var mars=document.getElementById('mars');[[8,12],[22,8],[40,15],[65,10],[80,6]].forEach(function(d,i){var dome=document.createElement('div');dome.style.cssText='position:absolute;bottom:0;left:'+d[0]+'%;width:'+d[1]+'%;height:'+(d[1]*0.6)+'%;background:rgba(50,20,10,0.5);border-radius:50% 50% 0 0;border-top:1px solid rgba(255,68,68,0.1)';mars.appendChild(dome);});",
+      "var neurons=document.getElementById('neurons');for(var i=0;i<25;i++){var n=document.createElement('div');n.style.cssText='position:absolute;width:4px;height:4px;border-radius:50%;background:#00ccaa;opacity:0;left:'+(Math.abs(Math.sin(i*41.7))*80+10)+'%;top:'+(Math.abs(Math.sin(i*67.3))*80+10)+'%';n.id='n'+i;neurons.appendChild(n);}",
       "const animation = new MulmoAnimation();",
-      "animation.animate('#logo', { opacity: [0, 1] }, { start: 0.2, end: 0.5 });",
-      "animation.animate('#title', { opacity: [0, 1], scale: [1.05, 1] }, { start: 0.5, end: 1.0, easing: 'easeOut' });",
-      "animation.animate('#status', { opacity: [0, 1] }, { start: 1.2, end: 1.4 });",
-      "animation.counter('#pct', [0, 100], { start: 1.2, end: 3.8, suffix: '%', decimals: 0 });",
-      "animation.animate('#bar', { width: [0, 100, '%'] }, { start: 1.2, end: 3.8, easing: 'easeInOut' });",
+      "animation.animate('#brain', { opacity: [0, 1] }, { start: 0, end: 0.8 });",
+      "animation.stagger('#n{i}', 25, { opacity: [0, 0.6] }, { start: 0.3, stagger: 0.05, duration: 0.1 });",
+      "animation.animate('#scanBeam', { opacity: [0, 0.4], translateY: [0, 320] }, { start: 0.2, end: 1.5 });",
+      "animation.animate('#logo', { opacity: [0, 1] }, { start: 0.8, end: 1.1 });",
+      "animation.animate('#title', { opacity: [0, 1], scale: [1.05, 1] }, { start: 1.0, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#status', { opacity: [0, 1] }, { start: 1.5, end: 1.7 });",
+      "animation.counter('#pct', [0, 100], { start: 1.5, end: 3.8, suffix: '%', decimals: 0 });",
+      "animation.animate('#bar', { width: [0, 100, '%'] }, { start: 1.5, end: 3.8, easing: 'easeInOut' });",
       "animation.animate('#g1', { opacity: [0, 0.6] }, { start: 2.0, end: 2.1 });",
       "animation.animate('#g1', { opacity: [0.6, 0] }, { start: 2.1, end: 2.3 });",
       "animation.animate('#g2', { opacity: [0, 0.4] }, { start: 3.0, end: 3.1 });",
@@ -1932,7 +2031,7 @@ Memory implant UI boots up with progress counter and reality glitch.
 
 ### Feature Beat — Memory Fragment / Split Reality
 
-Left: "Real" memory (teal). Right: "Implanted" memory (red). Dual panels.
+Mars landscape background visible through dual panels — "Real" vs "Implanted" memories. Reality glitch band.
 
 ```json
 {
@@ -1940,8 +2039,10 @@ Left: "Real" memory (teal). Right: "Implanted" memory (red). Dual panels.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0d0000'>",
-      "  <div class='h-full flex'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#1a0800,#331000 40%,#442200 70%,#331005)'>",
+      "  <div id='mars' class='absolute bottom-0 left-0 right-0' style='height:30%'></div>",
+      "  <div class='absolute inset-0' style='background:rgba(13,0,0,0.5)'></div>",
+      "  <div class='h-full flex relative'>",
       "    <div id='left' class='flex-1 flex flex-col justify-center px-12' style='border-right:2px solid #553333;opacity:0'>",
       "      <div class='text-xs tracking-[0.3em] mb-4' style='font-family:monospace;color:#00ccaa'>MEMORY — REAL</div>",
       "      <div class='text-3xl font-bold mb-4' style='font-family:\"Arial Black\",sans-serif;color:#00ccaa'>Earth</div>",
@@ -1953,11 +2054,12 @@ Left: "Real" memory (teal). Right: "Implanted" memory (red). Dual panels.
       "      <div class='text-sm leading-relaxed' style='font-family:monospace;color:#885555'>Synthetic memory detected. Origin: Rekall Inc. Classification: SECRET AGENT PACKAGE.</div>",
       "    </div>",
       "  </div>",
-      "  <div id='divider' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);font-family:monospace;color:white;font-size:24px;opacity:0'>?</div>",
+      "  <div id='divider' class='absolute' style='top:50%;left:50%;transform:translate(-50%,-50%);font-family:monospace;color:white;font-size:28px;opacity:0;text-shadow:0 0 20px rgba(255,255,255,0.5)'>?</div>",
       "  <div id='g1' class='absolute' style='top:40%;left:0;right:0;height:3px;background:#ffffff;opacity:0'></div>",
       "</div>"
     ],
     "script": [
+      "var mars=document.getElementById('mars');[[8,12],[22,8],[40,15],[65,10],[80,6]].forEach(function(d,i){var dome=document.createElement('div');dome.style.cssText='position:absolute;bottom:0;left:'+d[0]+'%;width:'+d[1]+'%;height:'+(d[1]*0.6)+'%;background:rgba(50,20,10,0.3);border-radius:50% 50% 0 0';mars.appendChild(dome);});",
       "const animation = new MulmoAnimation();",
       "animation.animate('#left', { opacity: [0, 1], translateX: [-20, 0] }, { start: 0.3, end: 1.0, easing: 'easeOut' });",
       "animation.animate('#right', { opacity: [0, 1], translateX: [20, 0] }, { start: 0.8, end: 1.5, easing: 'easeOut' });",
@@ -1972,7 +2074,7 @@ Left: "Real" memory (teal). Right: "Implanted" memory (red). Dual panels.
 
 ### Closing Beat — "What is Real?"
 
-Fragmented text with multiple glitch pulses.
+Mars landscape visible behind fragmenting reality — multiple glitch bands + question text.
 
 ```json
 {
@@ -1980,10 +2082,14 @@ Fragmented text with multiple glitch pulses.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0d0000'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:linear-gradient(180deg,#1a0800,#331000 40%,#442200 70%,#331005)'>",
+      "  <div id='mars' class='absolute bottom-0 left-0 right-0' style='height:30%'></div>",
+      "  <div class='absolute inset-0' style='background:rgba(13,0,0,0.4)'></div>",
       "  <div id='g1' class='absolute' style='top:30%;left:-5px;right:0;height:3px;background:#ff4444;opacity:0'></div>",
       "  <div id='g2' class='absolute' style='top:55%;left:0;right:-3px;height:2px;background:#00ccaa;opacity:0'></div>",
-      "  <div id='g3' class='absolute' style='top:80%;left:-3px;right:0;height:4px;background:#ffffff;opacity:0'></div>",
+      "  <div id='g3' class='absolute' style='top:75%;left:-3px;right:0;height:4px;background:#ffffff;opacity:0'></div>",
+      "  <div id='g4' class='absolute' style='top:15%;left:0;right:-5px;height:2px;background:#ff4444;opacity:0'></div>",
+      "  <div id='g5' class='absolute' style='top:88%;left:-4px;right:0;height:3px;background:#00ccaa;opacity:0'></div>",
       "  <div class='h-full flex flex-col items-center justify-center relative'>",
       "    <div id='q' class='text-6xl font-bold tracking-wider text-center' style='font-family:\"Arial Black\",sans-serif;color:#ff4444;opacity:0'>WHAT IS REAL?</div>",
       "    <div id='sub' class='text-xl mt-6' style='font-family:monospace;color:#00ccaa;opacity:0'>If you can't tell the difference, does it matter?</div>",
@@ -1991,14 +2097,19 @@ Fragmented text with multiple glitch pulses.
       "</div>"
     ],
     "script": [
+      "var mars=document.getElementById('mars');[[8,12],[22,8],[40,15],[65,10],[80,6]].forEach(function(d,i){var dome=document.createElement('div');dome.style.cssText='position:absolute;bottom:0;left:'+d[0]+'%;width:'+d[1]+'%;height:'+(d[1]*0.6)+'%;background:rgba(50,20,10,0.3);border-radius:50% 50% 0 0';mars.appendChild(dome);});",
       "const animation = new MulmoAnimation();",
       "animation.animate('#q', { opacity: [0, 1] }, { start: 0.5, end: 1.5 });",
       "animation.animate('#g1', { opacity: [0, 0.7] }, { start: 1.5, end: 1.6 });",
       "animation.animate('#g1', { opacity: [0.7, 0] }, { start: 1.6, end: 1.8 });",
       "animation.animate('#g2', { opacity: [0, 0.5] }, { start: 2.0, end: 2.1 });",
       "animation.animate('#g2', { opacity: [0.5, 0] }, { start: 2.1, end: 2.3 });",
-      "animation.animate('#g3', { opacity: [0, 0.8] }, { start: 2.5, end: 2.6 });",
-      "animation.animate('#g3', { opacity: [0.8, 0] }, { start: 2.6, end: 2.8 });",
+      "animation.animate('#g3', { opacity: [0, 0.8] }, { start: 2.3, end: 2.4 });",
+      "animation.animate('#g3', { opacity: [0.8, 0] }, { start: 2.4, end: 2.6 });",
+      "animation.animate('#g4', { opacity: [0, 0.4] }, { start: 2.6, end: 2.7 });",
+      "animation.animate('#g4', { opacity: [0.4, 0] }, { start: 2.7, end: 2.9 });",
+      "animation.animate('#g5', { opacity: [0, 0.6] }, { start: 2.9, end: 3.0 });",
+      "animation.animate('#g5', { opacity: [0.6, 0] }, { start: 3.0, end: 3.2 });",
       "animation.animate('#sub', { opacity: [0, 0.7] }, { start: 3.0, end: 4.0 });"
     ],
     "animation": true
@@ -2027,7 +2138,8 @@ Fragmented text with multiple glitch pulses.
 
 | Element | Value |
 |---------|-------|
-| Background | `background:#0a0e1a` (deep navy) |
+| Background scene | Hexagonal wireframe grid + 3D perspective floating translucent panels + arc reactor glow center |
+| Background color | `background:#0a0e1a` (deep navy) |
 | Primary color | `color:#4fc3f7` (JARVIS blue — UI, borders, text) |
 | Secondary color | `color:#81d4fa` (light blue — labels, secondary) |
 | Accent | `color:#ffffff` (white — highlights, key data) |
@@ -2038,54 +2150,81 @@ Fragmented text with multiple glitch pulses.
 | Panel background | `rgba(79,195,247,0.05)` |
 | Borders | `border:1px solid rgba(79,195,247,0.2)` |
 
-### Signature element — Arc Reactor Rings
+### Signature element — Hex Grid + 3D Floating Panels + Arc Reactor
 
-Concentric rotating rings simulating the arc reactor:
+Hexagonal wireframe background grid, semi-transparent panels at 3D angles using CSS perspective/rotateY, and a glowing arc reactor center.
 
+**Hex grid generator** (script):
+```javascript
+"var grid=document.getElementById('hex-grid');for(var r=0;r<8;r++){for(var c=0;c<14;c++){var h=document.createElement('div');var x=c*100+(r%2)*50-50;var y=r*87-50;h.style.cssText='position:absolute;left:'+x+'px;top:'+y+'px;width:55px;height:55px;border:1px solid rgba(79,195,247,0.04);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)';grid.appendChild(h);}}"
+```
+
+**3D floating panel** (html — CSS perspective + rotateY):
 ```html
-<div class='absolute inset-0 pointer-events-none flex items-center justify-center'>
-  <div style='position:absolute;width:400px;height:400px;border:1px solid rgba(79,195,247,0.1);border-radius:50%'></div>
-  <div style='position:absolute;width:280px;height:280px;border:1px solid rgba(79,195,247,0.15);border-radius:50%'></div>
-  <div style='position:absolute;width:160px;height:160px;border:1px solid rgba(79,195,247,0.08);border-radius:50%'></div>
-  <div style='position:absolute;width:8px;height:8px;background:#4fc3f7;border-radius:50%;box-shadow:0 0 20px #4fc3f7,0 0 40px rgba(79,195,247,0.3)'></div>
+<div style='perspective:1200px;transform-style:preserve-3d'>
+  <div id='panel0' style='position:absolute;top:12%;left:3%;width:38%;height:42%;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.15);transform:rotateY(12deg) rotateX(-3deg);backdrop-filter:blur(2px);padding:20px;opacity:0'>
+    <!-- content -->
+  </div>
 </div>
 ```
 
 ### Opening Beat — JARVIS System Activation
 
-Arc reactor rings expand outward, system status lines cascade in.
+Hex grid background appears, arc reactor expands from center, 3D floating panels slide in at angles, system boot cascade.
 
 ```json
 {
-  "duration": 4,
+  "duration": 5,
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0a0e1a'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0e1a'>",
+      "  <div id='hex-grid' class='absolute inset-0'></div>",
       "  <div class='absolute inset-0 flex items-center justify-center'>",
-      "    <div id='ring1' style='position:absolute;width:0;height:0;border:1px solid rgba(79,195,247,0.2);border-radius:50%;opacity:0'></div>",
-      "    <div id='ring2' style='position:absolute;width:0;height:0;border:1px solid rgba(79,195,247,0.15);border-radius:50%;opacity:0'></div>",
-      "    <div id='core' style='position:absolute;width:0;height:0;background:#4fc3f7;border-radius:50%;box-shadow:0 0 20px #4fc3f7;opacity:0'></div>",
+      "    <div id='glow' style='width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.15),transparent);opacity:0'></div>",
       "  </div>",
-      "  <div class='absolute top-8 left-10'>",
-      "    <div id='s0' class='text-xs mb-1' style='font-family:monospace;color:#4fc3f7;opacity:0'>JARVIS v7.2 — Online</div>",
-      "    <div id='s1' class='text-xs mb-1' style='font-family:monospace;color:#1a3a5c;opacity:0'>Arc Reactor: 100%</div>",
-      "    <div id='s2' class='text-xs' style='font-family:monospace;color:#1a3a5c;opacity:0'>All systems nominal</div>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div id='ring1' style='width:0;height:0;border:1px solid rgba(79,195,247,0.15);border-radius:50%;opacity:0'></div>",
+      "  </div>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div id='ring2' style='width:0;height:0;border:1px solid rgba(79,195,247,0.1);border-radius:50%;opacity:0'></div>",
+      "  </div>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div id='core' style='width:0;height:0;background:#4fc3f7;border-radius:50%;box-shadow:0 0 20px #4fc3f7,0 0 40px rgba(79,195,247,0.3);opacity:0'></div>",
+      "  </div>",
+      "  <div style='perspective:1200px;transform-style:preserve-3d;position:absolute;inset:0'>",
+      "    <div id='panelL' class='absolute' style='top:10%;left:3%;width:28%;height:35%;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.12);transform:rotateY(12deg) rotateX(-3deg);padding:15px;opacity:0'>",
+      "      <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>SYSTEM STATUS</div>",
+      "      <div id='s0' class='text-xs mb-2' style='font-family:monospace;color:#4fc3f7;opacity:0'>▸ JARVIS v7.2 — Online</div>",
+      "      <div id='s1' class='text-xs mb-2' style='font-family:monospace;color:#1a3a5c;opacity:0'>▸ Arc Reactor: 100%</div>",
+      "      <div id='s2' class='text-xs' style='font-family:monospace;color:#1a3a5c;opacity:0'>▸ All systems nominal</div>",
+      "    </div>",
+      "    <div id='panelR' class='absolute' style='top:12%;right:3%;width:26%;height:30%;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.12);transform:rotateY(-10deg) rotateX(2deg);padding:15px;opacity:0'>",
+      "      <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>DIAGNOSTICS</div>",
+      "      <div id='d0' class='text-xs mb-2' style='font-family:monospace;color:#4fc3f7;opacity:0'>▸ Thrusters: 98%</div>",
+      "      <div id='d1' class='text-xs mb-2' style='font-family:monospace;color:#ff9800;opacity:0'>▸ Weapons: 85%</div>",
+      "      <div id='d2' class='text-xs' style='font-family:monospace;color:#4fc3f7;opacity:0'>▸ Shields: Online</div>",
+      "    </div>",
       "  </div>",
       "  <div class='h-full flex flex-col items-center justify-center relative'>",
-      "    <div id='greeting' class='text-3xl tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#81d4fa;opacity:0'>Good evening, sir.</div>",
+      "    <div id='greeting' class='text-2xl tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#81d4fa;opacity:0'>Good evening, sir.</div>",
       "    <div id='title' class='text-6xl font-bold mt-4 tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#4fc3f7;opacity:0;text-shadow:0 0 30px rgba(79,195,247,0.3)'>TITLE</div>",
       "  </div>",
       "</div>"
     ],
     "script": [
+      "var grid=document.getElementById('hex-grid');for(var r=0;r<8;r++){for(var c=0;c<14;c++){var h=document.createElement('div');var x=c*100+(r%2)*50-50;var y=r*87-50;h.style.cssText='position:absolute;left:'+x+'px;top:'+y+'px;width:55px;height:55px;border:1px solid rgba(79,195,247,0.04);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)';grid.appendChild(h);}}",
       "const animation = new MulmoAnimation();",
+      "animation.animate('#glow', { opacity: [0, 0.4], width: [0, 500, 'px'], height: [0, 500, 'px'] }, { start: 0, end: 1.5, easing: 'easeOut' });",
       "animation.animate('#core', { opacity: [0, 1], width: [0, 12, 'px'], height: [0, 12, 'px'] }, { start: 0, end: 0.5, easing: 'easeOut' });",
-      "animation.animate('#ring2', { opacity: [0, 0.5], width: [0, 280, 'px'], height: [0, 280, 'px'] }, { start: 0.2, end: 1.2, easing: 'easeOut' });",
-      "animation.animate('#ring1', { opacity: [0, 0.3], width: [0, 400, 'px'], height: [0, 400, 'px'] }, { start: 0.4, end: 1.5, easing: 'easeOut' });",
-      "animation.stagger('#s{i}', 3, { opacity: [0, 1] }, { start: 0.5, stagger: 0.25, duration: 0.15 });",
-      "animation.animate('#greeting', { opacity: [0, 1] }, { start: 1.0, end: 1.5 });",
-      "animation.animate('#title', { opacity: [0, 1], scale: [1.1, 1] }, { start: 1.5, end: 2.2, easing: 'easeOut' });"
+      "animation.animate('#ring2', { opacity: [0, 0.3], width: [0, 280, 'px'], height: [0, 280, 'px'] }, { start: 0.2, end: 1.2, easing: 'easeOut' });",
+      "animation.animate('#ring1', { opacity: [0, 0.2], width: [0, 400, 'px'], height: [0, 400, 'px'] }, { start: 0.4, end: 1.5, easing: 'easeOut' });",
+      "animation.animate('#panelL', { opacity: [0, 1], translateX: [-30, 0] }, { start: 0.8, end: 1.3, easing: 'easeOut' });",
+      "animation.animate('#panelR', { opacity: [0, 1], translateX: [30, 0] }, { start: 1.0, end: 1.5, easing: 'easeOut' });",
+      "animation.stagger('#s{i}', 3, { opacity: [0, 1] }, { start: 1.2, stagger: 0.2, duration: 0.15 });",
+      "animation.stagger('#d{i}', 3, { opacity: [0, 1] }, { start: 1.5, stagger: 0.2, duration: 0.15 });",
+      "animation.animate('#greeting', { opacity: [0, 1] }, { start: 1.8, end: 2.3 });",
+      "animation.animate('#title', { opacity: [0, 1], scale: [1.1, 1] }, { start: 2.3, end: 3.0, easing: 'easeOut' });"
     ],
     "animation": true
   }
@@ -2094,7 +2233,7 @@ Arc reactor rings expand outward, system status lines cascade in.
 
 ### Feature Beat — Holographic Dashboard
 
-Floating data panels with counters and progress indicators, JARVIS blue glow.
+3D floating panels with counters and progress bars over hex grid, arc reactor background glow.
 
 ```json
 {
@@ -2102,43 +2241,52 @@ Floating data panels with counters and progress indicators, JARVIS blue glow.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0a0e1a'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0e1a'>",
+      "  <div id='hex-grid' class='absolute inset-0'></div>",
       "  <div class='absolute inset-0 flex items-center justify-center'>",
-      "    <div style='width:500px;height:500px;border:1px solid rgba(79,195,247,0.06);border-radius:50%'></div>",
+      "    <div style='width:500px;height:500px;border:1px solid rgba(79,195,247,0.04);border-radius:50%'></div>",
       "  </div>",
-      "  <div class='h-full flex flex-col justify-center px-16 relative'>",
-      "    <div id='header' class='text-xs tracking-[0.5em] mb-8' style='font-family:monospace;color:#4fc3f7;opacity:0'>SYSTEM DIAGNOSTICS</div>",
-      "    <div class='grid grid-cols-3 gap-5'>",
-      "      <div id='p0' class='p-5' style='border:1px solid rgba(79,195,247,0.2);background:rgba(79,195,247,0.03);opacity:0'>",
-      "        <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>ARC REACTOR</div>",
-      "        <div id='n0' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div>",
-      "        <div style='background:rgba(79,195,247,0.1);height:4px;border-radius:2px;margin-top:8px'><div id='b0' style='background:#4fc3f7;height:100%;border-radius:2px;width:0'></div></div>",
-      "      </div>",
-      "      <div id='p1' class='p-5' style='border:1px solid rgba(79,195,247,0.2);background:rgba(79,195,247,0.03);opacity:0'>",
-      "        <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>THRUSTERS</div>",
-      "        <div id='n1' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div>",
-      "        <div style='background:rgba(79,195,247,0.1);height:4px;border-radius:2px;margin-top:8px'><div id='b1' style='background:#4fc3f7;height:100%;border-radius:2px;width:0'></div></div>",
-      "      </div>",
-      "      <div id='p2' class='p-5' style='border:1px solid rgba(255,152,0,0.3);background:rgba(255,152,0,0.03);opacity:0'>",
-      "        <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#ff9800'>WEAPONS</div>",
-      "        <div id='n2' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:#ff9800'></div>",
-      "        <div style='background:rgba(255,152,0,0.1);height:4px;border-radius:2px;margin-top:8px'><div id='b2' style='background:#ff9800;height:100%;border-radius:2px;width:0'></div></div>",
+      "  <div style='perspective:1200px;transform-style:preserve-3d;position:absolute;inset:0'>",
+      "    <div id='p0' class='absolute' style='top:8%;left:2%;width:30%;height:40%;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.15);transform:rotateY(10deg);padding:18px;opacity:0'>",
+      "      <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>ARC REACTOR</div>",
+      "      <div id='n0' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div>",
+      "      <div style='background:rgba(79,195,247,0.1);height:4px;border-radius:2px;margin-top:10px'><div id='b0' style='background:#4fc3f7;height:100%;border-radius:2px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='p1' class='absolute' style='top:10%;left:35%;width:28%;height:35%;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.15);transform:rotateX(-3deg);padding:18px;opacity:0'>",
+      "      <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#81d4fa'>THRUSTERS</div>",
+      "      <div id='n1' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div>",
+      "      <div style='background:rgba(79,195,247,0.1);height:4px;border-radius:2px;margin-top:10px'><div id='b1' style='background:#4fc3f7;height:100%;border-radius:2px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='p2' class='absolute' style='top:8%;right:2%;width:28%;height:38%;background:rgba(255,152,0,0.04);border:1px solid rgba(255,152,0,0.2);transform:rotateY(-10deg);padding:18px;opacity:0'>",
+      "      <div class='text-xs tracking-widest mb-3' style='font-family:monospace;color:#ff9800'>WEAPONS</div>",
+      "      <div id='n2' class='text-4xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:#ff9800'></div>",
+      "      <div style='background:rgba(255,152,0,0.1);height:4px;border-radius:2px;margin-top:10px'><div id='b2' style='background:#ff9800;height:100%;border-radius:2px;width:0'></div></div>",
+      "    </div>",
+      "    <div id='pBottom' class='absolute' style='bottom:8%;left:15%;width:70%;height:22%;background:rgba(79,195,247,0.03);border:1px solid rgba(79,195,247,0.1);transform:rotateX(5deg);padding:15px;opacity:0'>",
+      "      <div class='flex justify-between'>",
+      "        <div><div class='text-xs mb-2' style='font-family:monospace;color:#81d4fa'>ALTITUDE</div><div id='alt' class='text-2xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div></div>",
+      "        <div><div class='text-xs mb-2' style='font-family:monospace;color:#81d4fa'>VELOCITY</div><div id='vel' class='text-2xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:white'></div></div>",
+      "        <div><div class='text-xs mb-2' style='font-family:monospace;color:#81d4fa'>HEADING</div><div id='hdg' class='text-2xl font-bold' style='font-family:\"Helvetica Neue\",sans-serif;color:#4fc3f7'></div></div>",
       "      </div>",
       "    </div>",
-      "    <div id='ai' class='mt-8 text-sm text-center' style='font-family:monospace;color:#81d4fa;opacity:0'>\"All systems are functioning within normal parameters, sir.\"</div>",
       "  </div>",
+      "  <div id='ai' class='absolute bottom-4 left-0 right-0 text-center text-sm' style='font-family:monospace;color:#81d4fa;opacity:0'>\"All systems are functioning within normal parameters, sir.\"</div>",
       "</div>"
     ],
     "script": [
+      "var grid=document.getElementById('hex-grid');for(var r=0;r<8;r++){for(var c=0;c<14;c++){var h=document.createElement('div');var x=c*100+(r%2)*50-50;var y=r*87-50;h.style.cssText='position:absolute;left:'+x+'px;top:'+y+'px;width:55px;height:55px;border:1px solid rgba(79,195,247,0.04);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)';grid.appendChild(h);}}",
       "const animation = new MulmoAnimation();",
-      "animation.animate('#header', { opacity: [0, 1] }, { start: 0, end: 0.3 });",
-      "animation.stagger('#p{i}', 3, { opacity: [0, 1], translateY: [15, 0] }, { start: 0.3, stagger: 0.3, duration: 0.3, easing: 'easeOut' });",
-      "animation.counter('#n0', [0, 100], { start: 0.5, end: 2.5, suffix: '%', decimals: 0 });",
-      "animation.animate('#b0', { width: [0, 100, '%'] }, { start: 0.5, end: 2.5, easing: 'easeOut' });",
-      "animation.counter('#n1', [0, 98], { start: 0.8, end: 2.5, suffix: '%', decimals: 0 });",
-      "animation.animate('#b1', { width: [0, 98, '%'] }, { start: 0.8, end: 2.5, easing: 'easeOut' });",
-      "animation.counter('#n2', [0, 85], { start: 1.1, end: 2.5, suffix: '%', decimals: 0 });",
-      "animation.animate('#b2', { width: [0, 85, '%'] }, { start: 1.1, end: 2.5, easing: 'easeOut' });",
+      "animation.stagger('#p{i}', 3, { opacity: [0, 1], translateY: [15, 0] }, { start: 0.2, stagger: 0.3, duration: 0.3, easing: 'easeOut' });",
+      "animation.animate('#pBottom', { opacity: [0, 1], translateY: [10, 0] }, { start: 1.2, end: 1.6, easing: 'easeOut' });",
+      "animation.counter('#n0', [0, 100], { start: 0.4, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#b0', { width: [0, 100, '%'] }, { start: 0.4, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#n1', [0, 98], { start: 0.7, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#b1', { width: [0, 98, '%'] }, { start: 0.7, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#n2', [0, 85], { start: 1.0, end: 2.5, suffix: '%', decimals: 0 });",
+      "animation.animate('#b2', { width: [0, 85, '%'] }, { start: 1.0, end: 2.5, easing: 'easeOut' });",
+      "animation.counter('#alt', [0, 12500], { start: 1.3, end: 3.0, suffix: 'ft', decimals: 0 });",
+      "animation.counter('#vel', [0, 340], { start: 1.3, end: 3.0, suffix: 'mph', decimals: 0 });",
+      "animation.counter('#hdg', [0, 270], { start: 1.3, end: 3.0, suffix: '°', decimals: 0 });",
       "animation.animate('#ai', { opacity: [0, 1] }, { start: 3.5, end: 4.0 });"
     ],
     "animation": true
@@ -2148,7 +2296,7 @@ Floating data panels with counters and progress indicators, JARVIS blue glow.
 
 ### Closing Beat — Suit Up / Hero Reveal
 
-Arc reactor flares, title scales in with glow.
+Arc reactor powers up with massive glow expansion over hex grid, suit silhouette outline, title.
 
 ```json
 {
@@ -2156,28 +2304,38 @@ Arc reactor flares, title scales in with glow.
   "image": {
     "type": "html_tailwind",
     "html": [
-      "<div class='h-full w-full relative' style='background:#0a0e1a'>",
+      "<div class='h-full w-full relative overflow-hidden' style='background:#0a0e1a'>",
+      "  <div id='hex-grid' class='absolute inset-0'></div>",
       "  <div class='absolute inset-0 flex items-center justify-center'>",
-      "    <div id='glow' style='width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.3),transparent);opacity:0'></div>",
+      "    <div id='glow' style='width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.3),rgba(79,195,247,0.05) 50%,transparent);opacity:0'></div>",
+      "  </div>",
+      "  <div id='suit' class='absolute' style='top:15%;left:35%;width:30%;height:70%;opacity:0'>",
+      "    <div style='width:100%;height:100%;border:1px solid rgba(79,195,247,0.12);border-radius:20% 20% 10% 10%;background:linear-gradient(180deg,rgba(79,195,247,0.03),transparent)'></div>",
+      "    <div style='position:absolute;top:35%;left:40%;width:20%;height:8%;background:radial-gradient(circle,rgba(79,195,247,0.3),transparent);border-radius:50%'></div>",
+      "  </div>",
+      "  <div class='absolute inset-0 flex items-center justify-center'>",
+      "    <div id='core' style='width:0;height:0;background:#4fc3f7;border-radius:50%;box-shadow:0 0 30px #4fc3f7,0 0 60px rgba(79,195,247,0.4);opacity:0'></div>",
       "  </div>",
       "  <div class='h-full flex flex-col items-center justify-center relative'>",
-      "    <div id='core' class='mb-8' style='width:0;height:0;background:#4fc3f7;border-radius:50%;box-shadow:0 0 30px #4fc3f7,0 0 60px rgba(79,195,247,0.4);opacity:0'></div>",
       "    <div id='title' class='text-7xl font-bold tracking-wider' style='font-family:\"Helvetica Neue\",Arial,sans-serif;color:#4fc3f7;opacity:0;text-shadow:0 0 40px rgba(79,195,247,0.4)'>TITLE</div>",
       "    <div id='tagline' class='text-xl mt-6 tracking-[0.3em]' style='font-family:monospace;color:#81d4fa;opacity:0'>SUIT UP</div>",
       "  </div>",
       "</div>"
     ],
     "script": [
+      "var grid=document.getElementById('hex-grid');for(var r=0;r<8;r++){for(var c=0;c<14;c++){var h=document.createElement('div');var x=c*100+(r%2)*50-50;var y=r*87-50;h.style.cssText='position:absolute;left:'+x+'px;top:'+y+'px;width:55px;height:55px;border:1px solid rgba(79,195,247,0.04);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)';grid.appendChild(h);}}",
       "const animation = new MulmoAnimation();",
-      "animation.animate('#glow', { opacity: [0, 0.5], width: [0, 600, 'px'], height: [0, 600, 'px'] }, { start: 0, end: 2.0, easing: 'easeOut' });",
+      "animation.animate('#suit', { opacity: [0, 0.5] }, { start: 0, end: 1.0 });",
+      "animation.animate('#glow', { opacity: [0, 0.6], width: [0, 700, 'px'], height: [0, 700, 'px'] }, { start: 0.3, end: 2.5, easing: 'easeOut' });",
       "animation.animate('#core', { opacity: [0, 1], width: [0, 20, 'px'], height: [0, 20, 'px'] }, { start: 0.3, end: 1.0, easing: 'easeOut' });",
-      "animation.animate('#title', { opacity: [0, 1], scale: [1.2, 1] }, { start: 1.0, end: 2.0, easing: 'easeOut' });",
-      "animation.animate('#tagline', { opacity: [0, 1] }, { start: 2.5, end: 3.0 });"
+      "animation.animate('#title', { opacity: [0, 1], scale: [1.2, 1] }, { start: 1.5, end: 2.5, easing: 'easeOut' });",
+      "animation.animate('#tagline', { opacity: [0, 1] }, { start: 3.0, end: 3.5 });"
     ],
     "animation": true
   }
 }
 ```
+
 
 ---
 
@@ -2207,11 +2365,11 @@ Each theme needs ONE distinctive visual element present in most beats:
 | Documentary | None (clean, minimal is the signature) |
 | Anime | Speed lines (`repeating-conic-gradient`) |
 | Horror | Red vignette (`radial-gradient`) |
-| Terminator | Red scan grid + targeting reticle |
-| DB Scouter | Concentric scouter rings (green circles) |
-| Blade Runner | Neon rain (colored vertical streaks) |
-| Total Recall | Glitch distortion bands (horizontal offset) |
-| JARVIS | Arc reactor rings (concentric blue circles + glow) |
+| Terminator | City silhouette + targeting brackets (red HUD overlay on scene) |
+| DB Scouter | Warrior silhouette + circular lens frame + power counter |
+| Blade Runner | Layered cityscape + neon signs + multi-depth rain + fog |
+| Total Recall | Mars domes + brain silhouette + scan beam + glitch bands |
+| JARVIS | Hex wireframe grid + 3D perspective floating panels + arc reactor |
 
 ### 3. Create beat templates (minimum 3)
 
