@@ -7,7 +7,6 @@ The runtime template injects helper functions (`interpolate`, `Easing`, `MulmoAn
 
 ```json
 {
-  "duration": 3,
   "image": {
     "type": "html_tailwind",
     "html": ["<div id='el'>...</div>"],
@@ -20,7 +19,7 @@ The runtime template injects helper functions (`interpolate`, `Easing`, `MulmoAn
 - `html`: HTML markup only (no `<script>` tags). Use Tailwind CSS classes.
 - `script`: JavaScript code (no `<script>` tags — automatically wrapped)
 - `animation`: `true` (30fps) or `{ "fps": 15 }` for custom fps
-- `duration`: Beat length in seconds. `totalFrames = floor(duration * fps)`. May be auto-calculated from audio.
+- `duration`: **Do NOT set** — automatically calculated from audio length. Only set explicitly for silent beats or when you need a fixed duration.
 
 ## Available Runtime APIs
 
@@ -91,7 +90,7 @@ animation.blink(selector, { interval? })  // interval: half-cycle seconds (defau
 ## Constraints
 
 - `animation` and `moviePrompt` cannot be used together on the same beat
-- `duration` is required when `animation` is set (may be auto-calculated from audio)
+- Do NOT set `duration` on animated beats — it is auto-calculated from the audio. Setting it explicitly can cause audio/video desync. Only set `duration` for silent beats or fixed-length intros.
 - `end: 'auto'` uses the beat's total duration (`totalFrames / fps`) as the end time
 - CSS animations/transitions are disabled in the template (deterministic frame rendering)
 - All elements that will be animated should have initial styles set inline (e.g., `style='opacity:0'`)
@@ -104,7 +103,7 @@ Embed real images (`<img>`) inside animated html_tailwind beats. Sample script: 
 
 1. **Variable name must be `animation`** — the auto-render system checks `typeof animation !== 'undefined'`. Using `const a = ...` will silently fail (no animation).
 2. **Wrap images in a `<div>` for transforms** — animate the wrapper, not the `<img>` directly. `object-fit:cover` on `<img>` conflicts with `scale`/`translate` transforms.
-3. **Use `file://` absolute paths** — Puppeteer loads HTML via `setContent` (origin `about:blank`), so relative paths won't resolve. `file://` URLs trigger temp-file loading via `page.goto`.
+3. **Use relative paths from the script file** — relative `src` paths are automatically resolved to `file://` absolute paths at render time. Example: if the script is at `scripts/samples/foo.json`, use `../../output/images/bar.png`. Absolute `file://` paths also work but are not portable.
 
 ### Pattern: Ken Burns (zoom + pan)
 
@@ -112,7 +111,7 @@ Embed real images (`<img>`) inside animated html_tailwind beats. Sample script: 
 "html": [
   "<div class='h-full w-full overflow-hidden relative bg-black'>",
   "  <div id='photo_wrap' style='position:absolute;inset:0;overflow:hidden'>",
-  "    <img src='file:///absolute/path/to/image.png' style='width:100%;height:100%;object-fit:cover' />",
+  "    <img src='../../output/images/sample/photo.png' style='width:100%;height:100%;object-fit:cover' />",
   "  </div>",
   "</div>"
 ],
@@ -129,7 +128,7 @@ Image as background, text panel slides in over a gradient scrim.
 ```json
 "html": [
   "<div class='h-full w-full relative bg-black'>",
-  "  <img src='file:///path/to/image.png' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover' />",
+  "  <img src='../../output/images/sample/photo.png' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover' />",
   "  <div style='position:absolute;inset:0;background:linear-gradient(to right, rgba(0,0,0,0.75), transparent)'></div>",
   "  <div id='panel' style='opacity:0;position:absolute;left:0;top:0;bottom:0;width:45%;display:flex;flex-direction:column;justify-content:center;padding:0 48px'>",
   "    <h2 id='h2' style='opacity:0;color:white;font-size:36px'>Title</h2>",
@@ -150,8 +149,8 @@ Wrap each image in a `<div id='w{i}'>`, cross-fade with `opacity`.
 ```json
 "html": [
   "<div class='h-full w-full relative bg-black overflow-hidden'>",
-  "  <div id='w0' style='position:absolute;inset:0'><img src='file:///path/img1.png' style='width:100%;height:100%;object-fit:cover' /></div>",
-  "  <div id='w1' style='position:absolute;inset:0;opacity:0'><img src='file:///path/img2.png' style='width:100%;height:100%;object-fit:cover' /></div>",
+  "  <div id='w0' style='position:absolute;inset:0'><img src='../../output/images/sample/img1.png' style='width:100%;height:100%;object-fit:cover' /></div>",
+  "  <div id='w1' style='position:absolute;inset:0;opacity:0'><img src='../../output/images/sample/img2.png' style='width:100%;height:100%;object-fit:cover' /></div>",
   "</div>"
 ],
 "script": [
