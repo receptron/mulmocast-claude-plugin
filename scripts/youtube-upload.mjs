@@ -4,7 +4,7 @@
  * YouTube Video Upload Script
  *
  * Usage:
- *   node scripts/youtube-upload.mjs --file <video.mp4> --title "Title" --description "Desc" [--tags "tag1,tag2"] [--privacy unlisted]
+ *   node scripts/youtube-upload.mjs --file <video.mp4> --title "Title" --description "Desc" [--tags "tag1,tag2"] [--privacy unlisted] [--channel <channelId>]
  *
  * Required env vars (in .env):
  *   YOUTUBE_CLIENT_ID
@@ -16,6 +16,7 @@ import { google } from "googleapis";
 import { readFileSync, createReadStream, existsSync } from "fs";
 import { resolve } from "path";
 import { parseArgs } from "util";
+import { createInterface } from "readline";
 
 const loadEnv = (envPath) => {
   if (!existsSync(envPath)) return;
@@ -42,6 +43,7 @@ const { values } = parseArgs({
     description: { type: "string", default: "" },
     tags: { type: "string", default: "" },
     privacy: { type: "string", default: "unlisted" },
+    channel: { type: "string", default: "" },
   },
 });
 
@@ -85,12 +87,52 @@ const createOAuth2Client = () => {
   return oauth2Client;
 };
 
+const prompt = (question) => {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+};
+
+const listChannels = async (youtube) => {
+  const response = await youtube.channels.list({
+    part: ["snippet"],
+    mine: true,
+  });
+  return response.data.items || [];
+};
+
+const selectChannel = async (youtube) => {
+  if (values.channel) return values.channel;
+
+  const channels = await listChannels(youtube);
+  if (channels.length <= 1) return undefined;
+
+  console.log("\nAvailable channels:");
+  channels.forEach((ch, i) => {
+    console.log(`  ${i + 1}. ${ch.snippet.title} (${ch.id})`);
+  });
+
+  const answer = await prompt(`\nSelect channel [1-${channels.length}]: `);
+  const index = parseInt(answer, 10) - 1;
+  if (index < 0 || index >= channels.length) {
+    console.error("Invalid selection");
+    process.exit(1);
+  }
+  return channels[index].id;
+};
+
 const uploadVideo = async () => {
   validateArgs();
   validateEnv();
 
   const auth = createOAuth2Client();
   const youtube = google.youtube({ version: "v3", auth });
+
+  const channelId = await selectChannel(youtube);
 
   const tags = values.tags
     ? values.tags.split(",").map((t) => t.trim())
@@ -99,16 +141,20 @@ const uploadVideo = async () => {
   console.log(`Uploading: ${values.file}`);
   console.log(`Title: ${values.title}`);
   console.log(`Privacy: ${values.privacy}`);
+  if (channelId) console.log(`Channel: ${channelId}`);
+
+  const snippet = {
+    title: values.title,
+    description: values.description,
+    tags,
+    categoryId: "22", // People & Blogs
+  };
+  if (channelId) snippet.channelId = channelId;
 
   const response = await youtube.videos.insert({
     part: ["snippet", "status"],
     requestBody: {
-      snippet: {
-        title: values.title,
-        description: values.description,
-        tags,
-        categoryId: "22", // People & Blogs
-      },
+      snippet,
       status: {
         privacyStatus: values.privacy,
         selfDeclaredMadeForKids: false,

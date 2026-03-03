@@ -15,13 +15,13 @@
 
 import { google } from "googleapis";
 import { createServer } from "http";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 import { URL } from "url";
 
 const REDIRECT_PORT = 3000;
 const REDIRECT_URI = `http://localhost:${REDIRECT_PORT}/oauth2callback`;
-const SCOPES = ["https://www.googleapis.com/auth/youtube.upload"];
+const SCOPES = ["https://www.googleapis.com/auth/youtube"];
 
 const loadEnv = (envPath) => {
   if (!existsSync(envPath)) return;
@@ -39,7 +39,24 @@ const loadEnv = (envPath) => {
   });
 };
 
-loadEnv(resolve(process.cwd(), ".env"));
+const ENV_PATH = resolve(process.cwd(), ".env");
+loadEnv(ENV_PATH);
+
+const updateEnvToken = (refreshToken) => {
+  if (!existsSync(ENV_PATH)) return;
+  const content = readFileSync(ENV_PATH, "utf-8");
+  const lines = content.split("\n");
+  const updated = lines.map((line) => {
+    if (line.trim().startsWith("YOUTUBE_REFRESH_TOKEN=")) {
+      return `YOUTUBE_REFRESH_TOKEN=${refreshToken}`;
+    }
+    return line;
+  });
+  if (!lines.some((l) => l.trim().startsWith("YOUTUBE_REFRESH_TOKEN="))) {
+    updated.push(`YOUTUBE_REFRESH_TOKEN=${refreshToken}`);
+  }
+  writeFileSync(ENV_PATH, updated.join("\n"));
+};
 
 const clientId = process.env.YOUTUBE_CLIENT_ID;
 const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
@@ -61,7 +78,7 @@ const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI
 const authUrl = oauth2Client.generateAuthUrl({
   access_type: "offline",
   scope: SCOPES,
-  prompt: "consent",
+  prompt: "select_account consent",
 });
 
 console.log("Open this URL in your browser:");
@@ -87,15 +104,25 @@ const server = createServer(async (req, res) => {
 
   try {
     const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    const youtube = google.youtube({ version: "v3", auth: oauth2Client });
+    const channelRes = await youtube.channels.list({ part: ["snippet"], mine: true });
+    const channels = channelRes.data.items || [];
+
     res.writeHead(200, { "Content-Type": "text/html" });
     res.end("<h1>Authorization successful!</h1><p>You can close this tab.</p>");
 
     console.log("");
     console.log("Authorization successful!");
     console.log("");
-    console.log("Add this to your .env file:");
-    console.log("");
-    console.log(`YOUTUBE_REFRESH_TOKEN=${tokens.refresh_token}`);
+    if (channels.length > 0) {
+      const ch = channels[0];
+      console.log(`Authenticated channel: ${ch.snippet.title} (${ch.id})`);
+      console.log("");
+    }
+    updateEnvToken(tokens.refresh_token);
+    console.log("YOUTUBE_REFRESH_TOKEN updated in .env");
     console.log("");
   } catch (err) {
     res.writeHead(500);
