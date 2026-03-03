@@ -100,7 +100,11 @@ Ask the user about orientation. Default to **landscape** (1280×720) for present
 
 When user asks for condensed/few slides, aim for 3-5 dense beats.
 
-**YouTube Shorts constraint**: When portrait orientation is selected for Shorts, limit to **3-5 beats** with short narrations (1-2 sentences each) to keep total duration **≤ 60 seconds**. Each beat typically produces ~8-12 seconds of audio.
+**YouTube Shorts constraint**: When portrait orientation is selected for Shorts:
+- Limit to **3-5 beats** with short narrations (1-2 sentences each) to keep total duration **≤ 60 seconds**. Each beat typically produces ~8-12 seconds of audio.
+- **MUST use `imagePrompt` + `html_tailwind` animation for ALL beats** — never static slides. Shorts need cinematic, visually dynamic content. Define one AI-generated background image per beat in `imageParams.images`, then animate with Ken Burns zoom, text fade-ins, counters, stagger effects, etc.
+- Use gradient overlays (`linear-gradient`) and `filter:brightness(0.3-0.4)` for text readability over AI images.
+- Reference example: `scripts/goldman-private-credit-warning/script.json`
 
 ### Present Beat Outline for approval
 
@@ -225,10 +229,52 @@ For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD ov
 | Content Type | Visual Mode |
 |-------------|-------------|
 | Data, charts, structured info | `slide` (default) |
-| Photographic / illustrative imagery | `imagePrompt` |
+| Photographic / illustrative imagery | `imagePrompt` (static) |
+| **Cinematic visuals with motion** | **`imagePrompt` + `html_tailwind` animation** |
 | Cinematic intros, text crawls, transitions | `html_tailwind` animation |
 | Data dashboards with animated counters | `html_tailwind` animation |
 | 3D card flips, reveals, code walkthroughs | `html_tailwind` animation |
+
+#### imagePrompt + html_tailwind animation (recommended for visual beats)
+
+Combine AI-generated images with animation for cinematic results. Define images in `imageParams.images`, then reference the generated files in `html_tailwind` HTML. `mulmo movie` generates images before rendering video, so the files exist at render time.
+
+**Path formula**: `../../output/images/{scriptBasename}/{imageKey}.png`
+
+```json
+{
+  "imageParams": {
+    "images": {
+      "bg_scene": { "type": "imagePrompt", "prompt": "Cinematic description..." }
+    }
+  },
+  "beats": [{
+    "text": "Narration",
+    "image": {
+      "type": "html_tailwind",
+      "html": [
+        "<div class='h-full w-full overflow-hidden relative bg-black'>",
+        "  <div id='wrap' style='position:absolute;inset:0;overflow:hidden'>",
+        "    <img src='../../output/images/script/bg_scene.png' style='width:100%;height:100%;object-fit:cover' />",
+        "  </div>",
+        "  <div style='position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)'></div>",
+        "  <div id='text' style='opacity:0;position:absolute;bottom:120px;left:48px;right:48px'>",
+        "    <h1 style='color:white;font-size:44px;font-weight:bold'>Title</h1>",
+        "  </div>",
+        "</div>"
+      ],
+      "script": [
+        "const animation = new MulmoAnimation();",
+        "animation.animate('#wrap', { scale: [1.0, 1.15] }, { start: 0, end: 'auto', easing: 'linear' });",
+        "animation.animate('#text', { opacity: [0,1], translateY: [40,0] }, { start: 0.5, end: 1.5, easing: 'easeOut' });"
+      ],
+      "animation": true
+    }
+  }]
+}
+```
+
+Tips: Use `filter:brightness(0.4)` or gradient overlays for text readability. Mix freely with static slide beats. See `references/html_animation_reference.md` § "Combining imagePrompt with html_tailwind Animation" for more patterns.
 
 #### Animated beat structure
 

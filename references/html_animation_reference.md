@@ -181,3 +181,93 @@ Image as background with CSS-drawn brackets, counters, scan lines.
 - **Zoom spotlight**: Wrapper scales up + vignette overlay fades in + callout ring
 - **Parallax layers**: Background/mid/front at different `translateX` speeds
 - **Morphing grid**: 2×2 grid with `stagger('#g{i}', 4, ...)` scale-in
+
+## Combining imagePrompt with html_tailwind Animation
+
+Use AI-generated images (`imagePrompt`) as backgrounds for animated beats. This produces cinematic visuals — AI art with Ken Burns, text overlays, counters, etc.
+
+### How it works
+
+`mulmo movie` executes in order: **audio → images → video**. By the time html_tailwind renders, images from `imageParams.images` already exist on disk. Reference them with `<img src>` using relative paths from the script file.
+
+### Path formula
+
+```
+../../output/images/{scriptBasename}/{imageKey}.png
+```
+
+Example: script at `scripts/my-news/script.json`, image key `bg_city` → `../../output/images/script/bg_city.png`
+
+### Full example: imagePrompt + Ken Burns + text overlay
+
+```json
+{
+  "imageParams": {
+    "images": {
+      "bg_finance": {
+        "type": "imagePrompt",
+        "prompt": "Dramatic Wall Street scene at dusk, towering glass buildings reflecting golden light, trading floor visible through windows, cinematic wide angle, photorealistic"
+      }
+    }
+  },
+  "beats": [
+    {
+      "text": "Narration text here",
+      "speaker": "Presenter",
+      "image": {
+        "type": "html_tailwind",
+        "html": [
+          "<div class='h-full w-full overflow-hidden relative bg-black'>",
+          "  <div id='wrap' style='position:absolute;inset:0;overflow:hidden'>",
+          "    <img src='../../output/images/script/bg_finance.png' style='width:100%;height:100%;object-fit:cover' />",
+          "  </div>",
+          "  <div style='position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)'></div>",
+          "  <div id='title' style='opacity:0;position:absolute;bottom:120px;left:48px;right:48px'>",
+          "    <div style='font-size:20px;color:#60A5FA;font-weight:bold;margin-bottom:12px'>BREAKING NEWS</div>",
+          "    <h1 style='color:white;font-size:44px;font-weight:bold;line-height:1.3'>Headline Text</h1>",
+          "  </div>",
+          "</div>"
+        ],
+        "script": [
+          "const animation = new MulmoAnimation();",
+          "animation.animate('#wrap', { scale: [1.0, 1.15] }, { start: 0, end: 'auto', easing: 'linear' });",
+          "animation.animate('#title', { opacity: [0,1], translateY: [40,0] }, { start: 0.5, end: 1.5, easing: 'easeOut' });"
+        ],
+        "animation": true
+      }
+    }
+  ]
+}
+```
+
+### Pattern: imagePrompt + data overlay
+
+AI image as background with animated metrics and callout boxes.
+
+```json
+"html": [
+  "<div class='h-full w-full overflow-hidden relative bg-black'>",
+  "  <div id='bg' style='position:absolute;inset:0;overflow:hidden'>",
+  "    <img src='../../output/images/script/bg_market.png' style='width:100%;height:100%;object-fit:cover;filter:brightness(0.4)' />",
+  "  </div>",
+  "  <div id='card' style='opacity:0;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border:1px solid #3B82F6;border-radius:16px;padding:48px;text-align:center'>",
+  "    <div style='color:#94A3B8;font-size:18px'>MARKET SIZE</div>",
+  "    <div id='counter' style='color:white;font-size:72px;font-weight:bold'>$0</div>",
+  "    <div style='color:#EF4444;font-size:20px;margin-top:8px'>Trillion</div>",
+  "  </div>",
+  "</div>"
+],
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.animate('#bg', { scale: [1.05, 1.0] }, { start: 0, end: 'auto', easing: 'linear' });",
+  "animation.animate('#card', { opacity: [0,1], scale: [0.8,1.0] }, { start: 0.3, end: 1.0, easing: 'easeOut' });",
+  "animation.counter('#counter', [0, 1.8], { start: 1.0, end: 3.0, prefix: '$', decimals: 1 });"
+]
+```
+
+### Tips
+
+- **Image prompt quality**: Write detailed, cinematic prompts. Include lighting, angle, mood. The image is the visual foundation.
+- **Darken for readability**: Use `filter:brightness(0.4)` on `<img>` or gradient overlays to ensure text is readable over AI images.
+- **One image per beat**: Each beat typically needs one background image. Define multiple keys in `imageParams.images` for multi-beat scripts.
+- **Mix with slides**: Animated imagePrompt beats can be mixed freely with static `slide` beats in the same script. Use animation for hook/close beats and slides for data-heavy beats.
