@@ -43,10 +43,10 @@ Upload a video file to YouTube. Automatically detects Shorts-eligible videos (ve
 
 ### Step 1: Identify the video file
 
-If a file path is provided, use it directly. Otherwise, look for the most recent `.mp4` in `output/`.
+If a file path is provided, use it directly. Otherwise, look for the most recent `.mp4` in `output/` subdirectories (videos are stored under `output/{topic}/script_ja.mp4`).
 
 ```bash
-ls -t output/**/*.mp4 2>/dev/null | head -5
+ls -t output/*/script_ja.mp4 2>/dev/null | head -5
 ```
 
 ### Step 2: Detect if the video is Shorts-eligible
@@ -63,12 +63,16 @@ ffprobe -v quiet -print_format json -show_streams -show_format <video_file>
 ### Step 3: Prepare title and description
 
 Ask the user for:
-- **Title** (max 100 chars)
-- **Description**
-- **Tags** (comma-separated)
+- **Title** (max 100 chars) — **[MUST] First 15 characters are critical**: Shorts feed truncates titles. Put the most impactful phrase first. For Japanese-target Shorts, do NOT add English subtitles (e.g., `| Shadow Bank`). Use that space for Japanese keywords.
+- **Description** — **[MUST]** Every upload MUST include a ~200 character summary of the news/content covered in the video. Extract this from the script.json `description` field or compose from the beat texts. NEVER upload with an empty description.
+- **Tags** — **[SHOULD]** Add topic-relevant tags beyond `#Shorts` (e.g., `円安,ホルムズ,投資,経済ニュース`). These improve search discoverability.
 - **Privacy** (public / unlisted / private, default: unlisted)
 
 For Shorts, automatically add `#Shorts` to the title if not already present.
+
+### Publishing pace
+
+- **[SHOULD]** Limit to **2-3 uploads per day** for optimal algorithm treatment. Bulk uploading (10+ in one day) can hurt channel evaluation.
 
 ### Step 4: Upload
 

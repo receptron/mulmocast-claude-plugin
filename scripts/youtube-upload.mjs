@@ -13,10 +13,11 @@
  */
 
 import { google } from "googleapis";
-import { readFileSync, createReadStream, existsSync } from "fs";
+import { readFileSync, createReadStream, existsSync, unlinkSync } from "fs";
 import { resolve } from "path";
 import { parseArgs } from "util";
 import { createInterface } from "readline";
+import { execSync } from "child_process";
 
 const loadEnv = (envPath) => {
   if (!existsSync(envPath)) return;
@@ -170,6 +171,39 @@ const uploadVideo = async () => {
   console.log(`Video ID: ${videoId}`);
   console.log(`URL: https://www.youtube.com/watch?v=${videoId}`);
   console.log(`Shorts URL: https://www.youtube.com/shorts/${videoId}`);
+
+  // Extract first frame and set as custom thumbnail
+  await setThumbnailFromFirstFrame(youtube, videoId, values.file);
+};
+
+const setThumbnailFromFirstFrame = async (youtube, videoId, videoFile) => {
+  const thumbPath = resolve(process.cwd(), `output/thumbnail_${videoId}.jpg`);
+  try {
+    execSync(
+      `ffmpeg -y -i "${videoFile}" -vframes 1 -ss 0 -q:v 2 "${thumbPath}"`,
+      { stdio: "pipe" },
+    );
+    if (!existsSync(thumbPath)) {
+      console.error("Thumbnail extraction failed: file not created");
+      return;
+    }
+    console.log(`Thumbnail extracted: ${thumbPath}`);
+
+    await youtube.thumbnails.set({
+      videoId,
+      media: {
+        mimeType: "image/jpeg",
+        body: createReadStream(thumbPath),
+      },
+    });
+    console.log("Custom thumbnail set successfully!");
+    unlinkSync(thumbPath);
+  } catch (err) {
+    console.error("Thumbnail upload failed:", err.message);
+    if (err.message.includes("forbidden") || err.message.includes("verify")) {
+      console.error("Note: Channel may need phone verification for custom thumbnails");
+    }
+  }
 };
 
 uploadVideo().catch((err) => {
