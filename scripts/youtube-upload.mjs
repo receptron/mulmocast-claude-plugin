@@ -126,6 +126,55 @@ const selectChannel = async (youtube) => {
   return channels[index].id;
 };
 
+const MORNING_START = 7;
+const MORNING_END = 9;
+const AFTERNOON_START = 15;
+const AFTERNOON_END = 17;
+
+const getJSTNow = () => {
+  const now = new Date();
+  const jstOffset_ms = 9 * 60 * 60 * 1000;
+  const utc = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
+  return new Date(utc + jstOffset_ms);
+};
+
+const isInPublishWindow = (jstNow) => {
+  const hour = jstNow.getHours();
+  const min = jstNow.getMinutes();
+  const time = hour + min / 60;
+  return (
+    (time >= MORNING_START && time < MORNING_END) ||
+    (time >= AFTERNOON_START && time < AFTERNOON_END)
+  );
+};
+
+const getNextPublishTime = (jstNow) => {
+  const hour = jstNow.getHours();
+  const min = jstNow.getMinutes();
+  const time = hour + min / 60;
+
+  const makeJSTDate = (baseDate, targetHour) => {
+    const d = new Date(baseDate);
+    d.setHours(targetHour, 0, 0, 0);
+    return d;
+  };
+
+  let scheduledJST;
+  if (time < MORNING_START) {
+    scheduledJST = makeJSTDate(jstNow, MORNING_START);
+  } else if (time >= MORNING_END && time < AFTERNOON_START) {
+    scheduledJST = makeJSTDate(jstNow, AFTERNOON_START);
+  } else {
+    // After AFTERNOON_END — schedule for next day morning
+    scheduledJST = makeJSTDate(jstNow, MORNING_START);
+    scheduledJST.setDate(scheduledJST.getDate() + 1);
+  }
+
+  // Convert JST to UTC for YouTube API
+  const jstOffset_ms = 9 * 60 * 60 * 1000;
+  return new Date(scheduledJST.getTime() - jstOffset_ms);
+};
+
 const uploadVideo = async () => {
   validateArgs();
   validateEnv();
@@ -152,14 +201,36 @@ const uploadVideo = async () => {
   };
   if (channelId) snippet.channelId = channelId;
 
+  // Determine scheduling for public uploads
+  const jstNow = getJSTNow();
+  let effectivePrivacy = values.privacy;
+  let publishAt = undefined;
+
+  if (values.privacy === "public") {
+    if (isInPublishWindow(jstNow)) {
+      console.log(`JST ${jstNow.toLocaleTimeString("ja-JP")} — within publish window, publishing immediately`);
+    } else {
+      const scheduledUTC = getNextPublishTime(jstNow);
+      publishAt = scheduledUTC.toISOString();
+      effectivePrivacy = "private";
+      const scheduledJST = new Date(scheduledUTC.getTime() + 9 * 60 * 60 * 1000);
+      console.log(`JST ${jstNow.toLocaleTimeString("ja-JP")} — outside publish window, scheduling for JST ${scheduledJST.toLocaleTimeString("ja-JP")}`);
+    }
+  }
+
+  const status = {
+    privacyStatus: effectivePrivacy,
+    selfDeclaredMadeForKids: false,
+  };
+  if (publishAt) {
+    status.publishAt = publishAt;
+  }
+
   const response = await youtube.videos.insert({
     part: ["snippet", "status"],
     requestBody: {
       snippet,
-      status: {
-        privacyStatus: values.privacy,
-        selfDeclaredMadeForKids: false,
-      },
+      status,
     },
     media: {
       body: createReadStream(values.file),
@@ -171,6 +242,10 @@ const uploadVideo = async () => {
   console.log(`Video ID: ${videoId}`);
   console.log(`URL: https://www.youtube.com/watch?v=${videoId}`);
   console.log(`Shorts URL: https://www.youtube.com/shorts/${videoId}`);
+  if (publishAt) {
+    const scheduledJST = new Date(new Date(publishAt).getTime() + 9 * 60 * 60 * 1000);
+    console.log(`Scheduled publish: ${scheduledJST.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })} JST`);
+  }
 
   // Extract first frame and set as custom thumbnail
   await setThumbnailFromFirstFrame(youtube, videoId, values.file);

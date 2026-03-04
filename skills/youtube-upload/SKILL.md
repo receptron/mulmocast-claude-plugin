@@ -63,12 +63,28 @@ ffprobe -v quiet -print_format json -show_streams -show_format <video_file>
 ### Step 3: Prepare title and description
 
 Ask the user for:
-- **Title** (max 100 chars) — **[MUST] First 15 characters are critical**: Shorts feed truncates titles. Put the most impactful phrase first. For Japanese-target Shorts, do NOT add English subtitles (e.g., `| Shadow Bank`). Use that space for Japanese keywords.
-- **Description** — **[MUST]** Every upload MUST include a ~200 character summary of the news/content covered in the video. Extract this from the script.json `description` field or compose from the beat texts. NEVER upload with an empty description.
-- **Tags** — **[SHOULD]** Add topic-relevant tags beyond `#Shorts` (e.g., `円安,ホルムズ,投資,経済ニュース`). These improve search discoverability.
+- **Title** (max 100 chars) — **[MUST] First 15 characters are critical**: Shorts feed truncates titles. Put the most impactful phrase first. Use curiosity gap (hint at something surprising without giving it all away). For Japanese-target Shorts, do NOT add English subtitles (e.g., `| Shadow Bank`). Use that space for Japanese keywords.
+- **Description** — **[MUST]** Every upload MUST include:
+  - ~200 character summary of the news/content
+  - **SEO keywords**: Include 3-5 searchable keywords naturally in the description (e.g., 円安, ホルムズ海峡, 原油価格, 日本経済)
+  - Extract from script.json `description` field or compose from beat texts. NEVER upload with an empty description.
+- **Tags** — **[MUST]** Add topic-relevant tags for search discoverability. Include:
+  - Topic-specific tags (e.g., `円安,ホルムズ海峡,原油`)
+  - Category tags (e.g., `経済ニュース,投資,金融`)
+  - Channel tags (e.g., `mulmocast`)
+  - `#Shorts` is added automatically to the title
 - **Privacy** (public / unlisted / private, default: unlisted)
 
 For Shorts, automatically add `#Shorts` to the title if not already present.
+
+### Publishing schedule (auto-scheduling)
+
+The upload script automatically handles scheduling based on JST time:
+- **Morning window**: JST 7:00-9:00
+- **Afternoon window**: JST 15:00-17:00
+- If current JST time is **within** a window → publish immediately as public
+- If current JST time is **outside** windows → schedule for the next available window (uploaded as private with `publishAt`)
+- This is handled automatically by `youtube-upload.mjs` — no manual scheduling needed when `--privacy public` is used
 
 ### Publishing pace
 

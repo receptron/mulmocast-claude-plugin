@@ -100,32 +100,7 @@ Ask the user about orientation. Default to **landscape** (1280×720) for present
 
 When user asks for condensed/few slides, aim for 3-5 dense beats.
 
-**YouTube Shorts constraint**: When portrait orientation is selected for Shorts:
-- **[MUST] Target ≤ 50 seconds total** (shorter = more loop replay = better algorithm). Use **2-3 beats** with short narrations (1-2 sentences each, ~15-20 seconds per beat). Each beat typically produces ~8-12 seconds of audio for 1 sentence, ~15-20 seconds for 2 sentences.
-- **MUST use `imagePrompt` + `html_tailwind` animation for ALL beats** — never static slides. Shorts need cinematic, visually dynamic content. Define one AI-generated background image per beat in `imageParams.images`, then animate with Ken Burns zoom, text fade-ins, counters, stagger effects, etc.
-- **[MUST] Beat 1 title layout — top 1/3, big text, visible from frame 0**:
-  - The title area occupies the **top ~1/3** of the screen (`top:80px` to ~640px). Use a top-to-bottom gradient overlay (`linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 35%, transparent 50%, ...)`) for text readability.
-  - **Main headline**: font-size **90-100px**, `font-weight:900`, `letter-spacing:4px`, `text-shadow:0 4px 20px rgba(0,0,0,0.8)`, `opacity:1` (NO fade-in), `color:#EF4444` or theme primary. A punchy 2-6 character phrase that grabs attention.
-  - **Sub-headline**: font-size **52-56px**, `font-weight:900`, `text-shadow:0 2px 10px rgba(0,0,0,0.8)`, `opacity:1`, white. 1-2 lines explaining the main headline.
-  - **Subtitle** (optional): font-size 28-30px, `opacity:0` → animate in at `start: 0.8`. Supporting detail or context.
-  - **Badge/tag** (optional): animate in at `start: 1.5` at bottom area.
-  - The main headline and sub-headline MUST NOT have any animation — they are static from frame 0. This ensures the YouTube thumbnail and Shorts feed show a clear, readable title.
-  - Example layout:
-    ```html
-    <div style='position:absolute;top:80px;left:60px;right:60px;text-align:center'>
-      <div style='color:#EF4444;font-size:100px;font-weight:900;line-height:1.1;letter-spacing:4px;text-shadow:0 4px 20px rgba(0,0,0,0.8)'>メインタイトル</div>
-      <div style='color:white;font-size:56px;font-weight:900;line-height:1.3;margin-top:20px;text-shadow:0 2px 10px rgba(0,0,0,0.8)'>サブヘッドライン</div>
-      <div id='sub' style='opacity:0;color:#F59E0B;font-size:30px;font-weight:bold;margin-top:24px'>補足テキスト</div>
-    </div>
-    ```
-- **[MUST] First 2 seconds maximum impact**: Animate in subtitle at `start: 0.8`, badge at `start: 1.5`. Ken Burns zoom on background image throughout.
-- Use gradient overlays for text readability over AI images.
-- Reference example: `scripts/20260304/indonesia-force-majeure/script.json`
-- **[MUST] Last beat engagement hook**: End the final beat's narration with a question or call to think (e.g., 「あなたはどう備えますか？」「コメントで教えてください」). This drives comments and engagement.
-- **[MUST] Title optimization — first 15 characters win**: YouTube Shorts feed truncates titles. The **first 15 characters** must convey the core hook. Put the most impactful phrase first, details second. Bad: `英住宅ローン会社MFSが破綻 —...`. Good: `二重担保で破綻 — 英MFS...`.
-- **[MUST] No English subtitles in title**: For Japanese-target Shorts, do NOT add English subtitles like `| Shadow Bank Collapse`. Use that space for more Japanese keywords instead.
-- **[MUST] Topic selection — "日本への影響" axis**: International news performs poorly unless framed as "impact on Japan / your wallet". Always connect foreign events to Japanese viewers' lives (e.g., ホルムズ封鎖 → 1ドル200円, MFS破綻 → 三井住友に飛び火). Pure foreign news without Japan angle should be avoided.
-- **[MUST] No duplicate topics**: Never create two separate videos on the same news event. If there's new information, create one comprehensive video instead of splitting.
+**Note**: For YouTube Shorts news videos, use the dedicated `/news-shorts` skill instead of `/story`.
 
 ### Present Beat Outline for approval
 
