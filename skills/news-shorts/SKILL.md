@@ -20,7 +20,7 @@ Create a YouTube Shorts news video from an article URL or text. One-shot flow: a
 | Beats | **2-3 beats** |
 | Visual | `imagePrompt` + `html_tailwind` animation (ALL beats) |
 | TTS | Kotodama, voiceId: `jikkyo_baby` |
-| Image | Google |
+| Image | Google, model: `gemini-3.1-flash-image-preview` |
 | BGM | `theme001.mp3`, volume 0.12 |
 
 ---
@@ -107,6 +107,17 @@ Never use static slides. Every beat has:
 1. One AI-generated background image (defined in `imageParams.images`)
 2. HTML overlay with text/data
 3. MulmoAnimation script for motion (Ken Burns, fade-ins, stagger)
+
+### [MUST] Image brightness — keep backgrounds visible
+
+AI-generated backgrounds should remain visible, not buried under dark overlays.
+
+- **Beat 1 gradient**: Use lighter overlay — `rgba(0,0,0,0.7)` top, `rgba(0,0,0,0.4)` middle (NOT 0.85/0.6)
+  ```
+  linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 35%, transparent 50%, transparent 65%, rgba(0,0,0,0.5) 100%)
+  ```
+- **Beat 2-3 brightness filter**: Use `filter:brightness(0.5)` (NOT 0.35). Let the image show through.
+- Text readability comes from `text-shadow`, not from darkening the entire image.
 
 ### [MUST] Beat 1 title layout — top 1/3, visible from frame 0
 
@@ -207,7 +218,7 @@ Use `date` command to get today's date for the directory name.
     "bgmVolume": 0.12
   },
   "slideParams": { "theme": { "..." : "..." } },
-  "imageParams": { "provider": "google", "images": { "bg_xxx": { "type": "imagePrompt", "prompt": "..." } } },
+  "imageParams": { "provider": "google", "model": "gemini-3.1-flash-image-preview", "images": { "bg_xxx": { "type": "imagePrompt", "prompt": "..." } } },
   "beats": [ ]
 }
 ```

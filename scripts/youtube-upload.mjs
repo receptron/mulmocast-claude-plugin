@@ -4,7 +4,7 @@
  * YouTube Video Upload Script
  *
  * Usage:
- *   node scripts/youtube-upload.mjs --file <video.mp4> --title "Title" --description "Desc" [--tags "tag1,tag2"] [--privacy unlisted] [--channel <channelId>]
+ *   node scripts/youtube-upload.mjs --file <video.mp4> --title "Title" --description "Desc" [--tags "tag1,tag2"] [--privacy unlisted] [--channel <channelId>] [--schedule "7:15"]
  *
  * Required env vars (in .env):
  *   YOUTUBE_CLIENT_ID
@@ -45,6 +45,7 @@ const { values } = parseArgs({
     tags: { type: "string", default: "" },
     privacy: { type: "string", default: "unlisted" },
     channel: { type: "string", default: "" },
+    schedule: { type: "string", default: "" },
   },
 });
 
@@ -170,9 +171,31 @@ const getNextPublishTime = (jstNow) => {
     scheduledJST.setDate(scheduledJST.getDate() + 1);
   }
 
-  // Convert JST to UTC for YouTube API
+  // Convert fake JST Date back to real UTC
+  // getJSTNow creates: fakeEpoch = realEpoch + timezoneOffset + 9h
+  // Reverse: realEpoch = fakeEpoch - timezoneOffset - 9h
+  const localOffset_ms = new Date().getTimezoneOffset() * 60 * 1000;
   const jstOffset_ms = 9 * 60 * 60 * 1000;
-  return new Date(scheduledJST.getTime() - jstOffset_ms);
+  return new Date(scheduledJST.getTime() - localOffset_ms - jstOffset_ms);
+};
+
+const parseScheduleTime = (jstNow, scheduleStr) => {
+  const [hourStr, minStr] = scheduleStr.split(":");
+  const targetHour = parseInt(hourStr, 10);
+  const targetMin = parseInt(minStr || "0", 10);
+
+  const scheduled = new Date(jstNow);
+  scheduled.setHours(targetHour, targetMin, 0, 0);
+
+  // If the time is in the past, schedule for tomorrow
+  if (scheduled.getTime() <= jstNow.getTime()) {
+    scheduled.setDate(scheduled.getDate() + 1);
+  }
+
+  // Convert fake JST Date back to real UTC
+  const localOffset_ms = new Date().getTimezoneOffset() * 60 * 1000;
+  const jstOffset_ms = 9 * 60 * 60 * 1000;
+  return new Date(scheduled.getTime() - localOffset_ms - jstOffset_ms);
 };
 
 const uploadVideo = async () => {
@@ -201,20 +224,25 @@ const uploadVideo = async () => {
   };
   if (channelId) snippet.channelId = channelId;
 
-  // Determine scheduling for public uploads
+  // Determine scheduling
   const jstNow = getJSTNow();
   let effectivePrivacy = values.privacy;
   let publishAt = undefined;
 
-  if (values.privacy === "public") {
+  if (values.schedule) {
+    // Explicit schedule: --schedule "7:15" (JST time, today or next applicable day)
+    const scheduledUTC = parseScheduleTime(jstNow, values.schedule);
+    publishAt = scheduledUTC.toISOString();
+    effectivePrivacy = "private";
+    console.log(`Scheduling for JST ${scheduledUTC.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}`);
+  } else if (values.privacy === "public") {
     if (isInPublishWindow(jstNow)) {
       console.log(`JST ${jstNow.toLocaleTimeString("ja-JP")} — within publish window, publishing immediately`);
     } else {
       const scheduledUTC = getNextPublishTime(jstNow);
       publishAt = scheduledUTC.toISOString();
       effectivePrivacy = "private";
-      const scheduledJST = new Date(scheduledUTC.getTime() + 9 * 60 * 60 * 1000);
-      console.log(`JST ${jstNow.toLocaleTimeString("ja-JP")} — outside publish window, scheduling for JST ${scheduledJST.toLocaleTimeString("ja-JP")}`);
+      console.log(`JST ${jstNow.toLocaleTimeString("ja-JP")} — outside publish window, scheduling for JST ${scheduledUTC.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}`);
     }
   }
 
@@ -243,8 +271,7 @@ const uploadVideo = async () => {
   console.log(`URL: https://www.youtube.com/watch?v=${videoId}`);
   console.log(`Shorts URL: https://www.youtube.com/shorts/${videoId}`);
   if (publishAt) {
-    const scheduledJST = new Date(new Date(publishAt).getTime() + 9 * 60 * 60 * 1000);
-    console.log(`Scheduled publish: ${scheduledJST.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })} JST`);
+    console.log(`Scheduled publish: ${new Date(publishAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })} JST`);
   }
 
   // Extract first frame and set as custom thumbnail
