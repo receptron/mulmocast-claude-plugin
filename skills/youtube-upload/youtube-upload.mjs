@@ -1,1 +1,0 @@
-../../scripts/youtube-upload.mjs
