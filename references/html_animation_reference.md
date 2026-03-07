@@ -103,7 +103,7 @@ Embed real images (`<img>`) inside animated html_tailwind beats. Sample script: 
 
 1. **Variable name must be `animation`** — the auto-render system checks `typeof animation !== 'undefined'`. Using `const a = ...` will silently fail (no animation).
 2. **Wrap images in a `<div>` for transforms** — animate the wrapper, not the `<img>` directly. `object-fit:cover` on `<img>` conflicts with `scale`/`translate` transforms.
-3. **Use relative paths from the script file** — relative `src` paths are automatically resolved to `file://` absolute paths at render time. Example: if the script is at `scripts/samples/foo.json`, use `../../output/images/bar.png`. Absolute `file://` paths also work but are not portable.
+3. **Use `image:` URL scheme** — reference `imageParams.images` with `src="image:{imageKey}"` (e.g., `src="image:bg_scene"`). Mulmocast resolves these automatically. Relative paths and absolute `file://` paths also still work but `image:` is preferred.
 
 ### Pattern: Ken Burns (zoom + pan)
 
@@ -111,7 +111,7 @@ Embed real images (`<img>`) inside animated html_tailwind beats. Sample script: 
 "html": [
   "<div class='h-full w-full overflow-hidden relative bg-black'>",
   "  <div id='photo_wrap' style='position:absolute;inset:0;overflow:hidden'>",
-  "    <img src='../../output/images/sample/photo.png' style='width:100%;height:100%;object-fit:cover' />",
+  "    <img src='image:photo' style='width:100%;height:100%;object-fit:cover' />",
   "  </div>",
   "</div>"
 ],
@@ -128,7 +128,7 @@ Image as background, text panel slides in over a gradient scrim.
 ```json
 "html": [
   "<div class='h-full w-full relative bg-black'>",
-  "  <img src='../../output/images/sample/photo.png' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover' />",
+  "  <img src='image:photo' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover' />",
   "  <div style='position:absolute;inset:0;background:linear-gradient(to right, rgba(0,0,0,0.75), transparent)'></div>",
   "  <div id='panel' style='opacity:0;position:absolute;left:0;top:0;bottom:0;width:45%;display:flex;flex-direction:column;justify-content:center;padding:0 48px'>",
   "    <h2 id='h2' style='opacity:0;color:white;font-size:36px'>Title</h2>",
@@ -149,8 +149,8 @@ Wrap each image in a `<div id='w{i}'>`, cross-fade with `opacity`.
 ```json
 "html": [
   "<div class='h-full w-full relative bg-black overflow-hidden'>",
-  "  <div id='w0' style='position:absolute;inset:0'><img src='../../output/images/sample/img1.png' style='width:100%;height:100%;object-fit:cover' /></div>",
-  "  <div id='w1' style='position:absolute;inset:0;opacity:0'><img src='../../output/images/sample/img2.png' style='width:100%;height:100%;object-fit:cover' /></div>",
+  "  <div id='w0' style='position:absolute;inset:0'><img src='image:img1' style='width:100%;height:100%;object-fit:cover' /></div>",
+  "  <div id='w1' style='position:absolute;inset:0;opacity:0'><img src='image:img2' style='width:100%;height:100%;object-fit:cover' /></div>",
   "</div>"
 ],
 "script": [
@@ -188,15 +188,15 @@ Use AI-generated images (`imagePrompt`) as backgrounds for animated beats. This 
 
 ### How it works
 
-`mulmo movie` executes in order: **audio → images → video**. By the time html_tailwind renders, images from `imageParams.images` already exist on disk. Reference them with `<img src>` using relative paths from the script file.
+`mulmo movie` executes in order: **audio → images → video**. By the time html_tailwind renders, images from `imageParams.images` already exist on disk. Reference them with `<img src="image:{imageKey}">` — the `image:` URL scheme resolves automatically.
 
-### Path formula
+### Syntax
 
+```html
+<img src="image:{imageKey}" />
 ```
-../../output/images/{scriptBasename}/{imageKey}.png
-```
 
-Example: script at `scripts/my-news/script.json`, image key `bg_city` → `../../output/images/script/bg_city.png`
+Example: image key `bg_city` → `<img src="image:bg_city" />`
 
 ### Full example: imagePrompt + Ken Burns + text overlay
 
@@ -219,7 +219,7 @@ Example: script at `scripts/my-news/script.json`, image key `bg_city` → `../..
         "html": [
           "<div class='h-full w-full overflow-hidden relative bg-black'>",
           "  <div id='wrap' style='position:absolute;inset:0;overflow:hidden'>",
-          "    <img src='../../output/images/script/bg_finance.png' style='width:100%;height:100%;object-fit:cover' />",
+          "    <img src='image:bg_finance' style='width:100%;height:100%;object-fit:cover' />",
           "  </div>",
           "  <div style='position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)'></div>",
           "  <div id='title' style='opacity:0;position:absolute;bottom:120px;left:48px;right:48px'>",
@@ -248,7 +248,7 @@ AI image as background with animated metrics and callout boxes.
 "html": [
   "<div class='h-full w-full overflow-hidden relative bg-black'>",
   "  <div id='bg' style='position:absolute;inset:0;overflow:hidden'>",
-  "    <img src='../../output/images/script/bg_market.png' style='width:100%;height:100%;object-fit:cover;filter:brightness(0.4)' />",
+  "    <img src='image:bg_market' style='width:100%;height:100%;object-fit:cover;filter:brightness(0.4)' />",
   "  </div>",
   "  <div id='card' style='opacity:0;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border:1px solid #3B82F6;border-radius:16px;padding:48px;text-align:center'>",
   "    <div style='color:#94A3B8;font-size:18px'>MARKET SIZE</div>",
