@@ -10,7 +10,7 @@
  * 5. Run this script to get the refresh token
  *
  * Usage:
- *   node scripts/youtube-auth.mjs
+ *   node scripts/yt-auth.mjs
  */
 
 import { google } from "googleapis";
@@ -18,26 +18,11 @@ import { createServer } from "http";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 import { URL } from "url";
+import { loadEnv } from "./lib/youtube-client.mjs";
 
 const REDIRECT_PORT = 3000;
 const REDIRECT_URI = `http://localhost:${REDIRECT_PORT}/oauth2callback`;
 const SCOPES = ["https://www.googleapis.com/auth/youtube"];
-
-const loadEnv = (envPath) => {
-  if (!existsSync(envPath)) return;
-  const lines = readFileSync(envPath, "utf-8").split("\n");
-  lines.forEach((line) => {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) return;
-    const eqIndex = trimmed.indexOf("=");
-    if (eqIndex === -1) return;
-    const key = trimmed.slice(0, eqIndex).trim();
-    const value = trimmed.slice(eqIndex + 1).trim();
-    if (!process.env[key]) {
-      process.env[key] = value;
-    }
-  });
-};
 
 const ENV_PATH = resolve(process.cwd(), ".env");
 loadEnv(ENV_PATH);
@@ -62,18 +47,28 @@ const clientId = process.env.YOUTUBE_CLIENT_ID;
 const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
 
 if (!clientId || !clientSecret) {
-  console.error("Set YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET in .env first.");
+  console.error(
+    "Set YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET in .env first.",
+  );
   console.error("");
   console.error("Steps:");
   console.error("1. Go to https://console.cloud.google.com/");
   console.error("2. Create a project (or select existing)");
   console.error("3. Enable YouTube Data API v3");
-  console.error("4. Go to Credentials → Create OAuth 2.0 Client ID (Desktop app)");
-  console.error("5. Add YOUTUBE_CLIENT_ID=... and YOUTUBE_CLIENT_SECRET=... to .env");
+  console.error(
+    "4. Go to Credentials → Create OAuth 2.0 Client ID (Desktop app)",
+  );
+  console.error(
+    "5. Add YOUTUBE_CLIENT_ID=... and YOUTUBE_CLIENT_SECRET=... to .env",
+  );
   process.exit(1);
 }
 
-const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI);
+const oauth2Client = new google.auth.OAuth2(
+  clientId,
+  clientSecret,
+  REDIRECT_URI,
+);
 
 const authUrl = oauth2Client.generateAuthUrl({
   access_type: "offline",
@@ -107,11 +102,16 @@ const server = createServer(async (req, res) => {
     oauth2Client.setCredentials(tokens);
 
     const youtube = google.youtube({ version: "v3", auth: oauth2Client });
-    const channelRes = await youtube.channels.list({ part: ["snippet"], mine: true });
+    const channelRes = await youtube.channels.list({
+      part: ["snippet"],
+      mine: true,
+    });
     const channels = channelRes.data.items || [];
 
     res.writeHead(200, { "Content-Type": "text/html" });
-    res.end("<h1>Authorization successful!</h1><p>You can close this tab.</p>");
+    res.end(
+      "<h1>Authorization successful!</h1><p>You can close this tab.</p>",
+    );
 
     console.log("");
     console.log("Authorization successful!");
