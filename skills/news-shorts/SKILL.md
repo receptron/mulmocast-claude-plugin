@@ -316,7 +316,7 @@ For scripts at `scripts/YYYYMMDD/{topic}/script.json` with `-o output/{topic}`:
 
 ### Animation reference
 
-For full MulmoAnimation DSL, **Read** `references/html_animation_reference.md`.
+For full MulmoAnimation DSL, **Read** `${CLAUDE_SKILL_DIR}/html_animation_reference.md`.
 
 ---
 
@@ -382,7 +382,7 @@ npx mulmocast@latest movie scripts/YYYYMMDD/{topic}/script.json -o output/{topic
 Wait for user confirmation before uploading. Use:
 
 ```bash
-node scripts/youtube-upload.mjs \
+node ${CLAUDE_SKILL_DIR}/youtube-upload.mjs \
   --file "output/{topic}/script_ja.mp4" \
   --title "タイトル #Shorts" \
   --description "..." \
