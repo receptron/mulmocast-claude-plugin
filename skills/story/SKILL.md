@@ -198,7 +198,7 @@ Define images in `imageParams.images`, then reference with `imageRef` blocks in 
 { "type": "imageRef", "ref": "keyVisual", "alt": "Description", "fit": "contain" }
 ```
 
-**Path formula**: From `scripts/samples/` to `output/images/` = `../../output/images/{basename}/{filename}`.
+**Path formula**: Use `image:` URL scheme — `src="image:keyVisual"` references `imageParams.images.keyVisual` automatically. No file paths needed.
 
 For AI-generated images when no real counterpart exists, use `imagePrompt` in `imageParams.images` (object form — defines a named image for `imageRef` to reference):
 ```json
@@ -218,7 +218,7 @@ For beats that benefit from motion — cinematic intros, opening crawls, data vi
 
 For cinematic theme recipes (Star Wars, cyberpunk, mecha anime, film noir, synthwave, Matrix, documentary, anime opening, horror, Terminator, Dragon Ball scouter, Blade Runner, Total Recall, JARVIS), **Read** `references/cinematic_patterns.md`.
 
-For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD overlay on photos), see the "Image Animation Patterns" section in `references/html_animation_reference.md`. Key rules: variable must be named `animation`, wrap `<img>` in `<div>` for transforms, use relative paths from the script file (automatically resolved to `file://` at render time).
+For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD overlay on photos), see the "Image Animation Patterns" section in `references/html_animation_reference.md`. Key rules: variable must be named `animation`, wrap `<img>` in `<div>` for transforms, use `image:` URL scheme (`src="image:bg_scene"`) to reference `imageParams.images`.
 
 #### When to use animation
 
@@ -233,9 +233,9 @@ For **image animation patterns** (Ken Burns, overlay, carousel, parallax, HUD ov
 
 #### imagePrompt + html_tailwind animation (recommended for visual beats)
 
-Combine AI-generated images with animation for cinematic results. Define images in `imageParams.images`, then reference the generated files in `html_tailwind` HTML. `mulmo movie` generates images before rendering video, so the files exist at render time.
+Combine AI-generated images with animation for cinematic results. Define images in `imageParams.images`, then reference them in `html_tailwind` HTML using `image:` URL scheme. `mulmo movie` generates images before rendering video, so the files exist at render time.
 
-**Path formula**: `../../output/images/{scriptBasename}/{imageKey}.png`
+Use `image:` URL scheme — no file paths needed:
 
 ```json
 {
@@ -251,7 +251,7 @@ Combine AI-generated images with animation for cinematic results. Define images 
       "html": [
         "<div class='h-full w-full overflow-hidden relative bg-black'>",
         "  <div id='wrap' style='position:absolute;inset:0;overflow:hidden'>",
-        "    <img src='../../output/images/script/bg_scene.png' style='width:100%;height:100%;object-fit:cover' />",
+        "    <img src='image:bg_scene' style='width:100%;height:100%;object-fit:cover' />",
         "  </div>",
         "  <div style='position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)'></div>",
         "  <div id='text' style='opacity:0;position:absolute;bottom:120px;left:48px;right:48px'>",
