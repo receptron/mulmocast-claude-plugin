@@ -31,7 +31,7 @@ Upload a video file to YouTube. Automatically detects Shorts-eligible videos (ve
    - Enable **YouTube Data API v3**
    - Go to **Credentials** → **Create OAuth 2.0 Client ID** (Desktop app)
    - Add `YOUTUBE_CLIENT_ID` and `YOUTUBE_CLIENT_SECRET` to `.env`
-   - Run `node scripts/youtube-auth.mjs` to get `YOUTUBE_REFRESH_TOKEN`
+   - Run `node scripts/yt-auth.mjs` to get `YOUTUBE_REFRESH_TOKEN`
 
 ## Invocation
 
@@ -84,7 +84,7 @@ The upload script automatically handles scheduling based on JST time:
 - **Afternoon window**: JST 15:00-17:00
 - If current JST time is **within** a window → publish immediately as public
 - If current JST time is **outside** windows → schedule for the next available window (uploaded as private with `publishAt`)
-- This is handled automatically by `youtube-upload.mjs` — no manual scheduling needed when `--privacy public` is used
+- This is handled automatically by `yt-upload.mjs` — no manual scheduling needed when `--privacy public` is used
 
 ### Publishing pace
 
@@ -93,7 +93,7 @@ The upload script automatically handles scheduling based on JST time:
 ### Step 4: Upload
 
 ```bash
-node scripts/youtube-upload.mjs \
+node scripts/yt-upload.mjs \
   --file "<video_file>" \
   --title "<title>" \
   --description "<description>" \

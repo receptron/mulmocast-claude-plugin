@@ -178,7 +178,25 @@ Set these in a `.env` file in your project root.
 
 See [MulmoCast CLI setup](https://github.com/receptron/mulmocast-cli#configuration) for full details.
 
-## YouTube Upload Setup
+## YouTube Tools
+
+### Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `scripts/yt-auth.mjs` | OAuth2 initial setup (one-time) |
+| `scripts/yt-upload.mjs` | Upload video with auto-scheduling |
+| `scripts/yt-video.mjs` | Check video info (multiple IDs) |
+| `scripts/yt-update.mjs` | Update video (--public, --schedule, --description, --thumbnail) |
+| `scripts/yt-stats.mjs` | Channel stats (--json, --topics, --shorts) |
+| `scripts/yt-analyze.mjs` | Offline analysis (stdin or --file) |
+| `scripts/yt-delete.mjs` | Delete a video |
+
+Shared code is in `scripts/lib/youtube-client.mjs`.
+
+> **Known limitation**: These scripts are designed to run from the plugin root directory (`node scripts/yt-*.mjs`). They resolve `.env` from `process.cwd()` and `googleapis` from the plugin's `node_modules/`. When this plugin is installed by other users via Claude Code, the scripts may not be directly executable from the user's project directory. A future improvement would be to publish them as a separate npm package or use `import.meta.url` for path resolution.
+
+### Setup
 
 The `/mulmocast:youtube-upload` skill requires YouTube Data API credentials. Follow these steps to set up.
 
@@ -232,7 +250,7 @@ YOUTUBE_CLIENT_SECRET=your_client_secret_here
 Run the auth script:
 
 ```bash
-node scripts/youtube-auth.mjs
+node scripts/yt-auth.mjs
 ```
 
 1. A URL will be displayed — open it in your browser
@@ -255,7 +273,7 @@ yarn install
 Test with an unlisted upload:
 
 ```bash
-node scripts/youtube-upload.mjs \
+node scripts/yt-upload.mjs \
   --file "output/your-video/video.mp4" \
   --title "Test Upload" \
   --privacy unlisted
