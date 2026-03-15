@@ -18,7 +18,7 @@ The runtime template injects helper functions (`interpolate`, `Easing`, `MulmoAn
 
 - `html`: HTML markup only (no `<script>` tags). Use Tailwind CSS classes.
 - `script`: JavaScript code (no `<script>` tags — automatically wrapped)
-- `animation`: `true` (30fps) or `{ "fps": 15 }` for custom fps
+- `animation`: `true` (30fps), `{ "fps": 15 }` for custom fps, or `{ "movie": true }` for ~7-8x faster CDP screencast recording (recommended)
 - `duration`: **Do NOT set** — automatically calculated from audio length. Only set explicitly for silent beats or when you need a fixed duration.
 
 ## Available Runtime APIs
@@ -70,6 +70,14 @@ animation.codeReveal(selector, linesArray, { start, end })
 
 // Blink — periodic show/hide toggle (e.g. cursor)
 animation.blink(selector, { interval? })  // interval: half-cycle seconds (default 0.5)
+
+// Cover zoom (Ken Burns zoom without black borders)
+animation.coverZoom(selector, { zoomFrom, zoomTo, start, end, easing?, containerSelector? })
+
+// Cover pan (Ken Burns pan without black borders)
+animation.coverPan(selector, { axis, direction?, distance?, from?, to?, start, end, easing?, zoom?, containerSelector? })
+// axis: 'x' or 'y'
+// from/to: 0..100 (0=edge, 50=center, 100=opposite edge)
 
 // Auto-render: if variable is named `animation`, render() is auto-generated.
 // No need to define render() manually.
@@ -265,9 +273,113 @@ AI image as background with animated metrics and callout boxes.
 ]
 ```
 
+### Pattern: coverZoom (Ken Burns zoom — no black borders)
+
+Unlike `animate('#wrap', { scale: ... })`, `coverZoom` applies `object-fit:cover`-aware zoom directly to the `<img>` element, ensuring no black borders appear during zoom.
+
+```json
+"html": [
+  "<div class='h-full w-full overflow-hidden relative bg-black'>",
+  "  <div id='outer' style='position:absolute;inset:0;overflow:hidden'>",
+  "    <img id='photo_img' src='image:bg_scene' style='width:100%;height:100%;object-fit:cover' />",
+  "  </div>",
+  "</div>"
+],
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.coverZoom('#photo_img', { zoomFrom: 1.0, zoomTo: 1.3, start: 0, end: 'auto', containerSelector: '#outer' });"
+]
+```
+
+### Pattern: coverPan (Ken Burns pan — no black borders)
+
+Pans along x or y axis with clamped movement to prevent black borders. `from`/`to` are normalized 0-100 (0=edge, 50=center, 100=opposite edge).
+
+```json
+"script": [
+  "const animation = new MulmoAnimation();",
+  "animation.coverPan('#photo_img', { axis: 'x', from: 20, to: 80, start: 0, end: 'auto', zoom: 1.2, containerSelector: '#outer' });"
+]
+```
+
+### Per-image canvasSize for imagePrompt
+
+Generate images at a different aspect ratio from the main canvas. Useful for landscape photos that will be panned/zoomed in a portrait canvas.
+
+```json
+"imageParams": {
+  "images": {
+    "bg_landscape": {
+      "type": "imagePrompt",
+      "prompt": "Wide panoramic cityscape at sunset...",
+      "canvasSize": { "width": 1920, "height": 1080 }
+    }
+  }
+}
+```
+
+When `canvasSize` is specified, it overrides the script-level `canvasSize` for that image only. This enables generating a 16:9 landscape image to pan across in a 9:16 portrait video.
+
+## Data-Attribute Declarative Animations (v2.5.0+)
+
+Instead of writing JavaScript in the `script` field, you can declare animations using HTML `data-*` attributes directly on elements. Elements with `data-animation` are auto-scanned and registered.
+
+### Supported types and attributes
+
+| Type | Key Attributes |
+|------|---|
+| `animate` | `data-opacity`, `data-translate-x`, `data-translate-y`, `data-scale`, `data-rotate`, `data-rotate-x/y/z`, `data-width`, `data-height` |
+| `stagger` | Same as animate + `data-count`, `data-stagger`, `data-duration` |
+| `counter` | `data-from`, `data-to`, `data-prefix`, `data-suffix`, `data-decimals` |
+| `typewriter` | `data-text` |
+| `codeReveal` | `data-lines` (JSON array) |
+| `blink` | `data-interval` |
+| `coverZoom` | `data-zoom-from`, `data-zoom-to` |
+| `coverPan` | `data-axis`, `data-direction`, `data-distance`, `data-from`, `data-to`, `data-zoom` |
+
+**Common to all:** `data-start`, `data-end`, `data-easing`, `data-container`
+
+### Examples
+
+**coverZoom without script:**
+```html
+<img src='image:bg' data-animation='coverZoom'
+     data-zoom-from='1.0' data-zoom-to='1.4'
+     data-container='#outer' />
+```
+
+**Animate with opacity and translation:**
+```html
+<div data-animation='animate'
+     data-opacity='0,1' data-translate-y='30,0'
+     data-start='0.3'>Breaking News</div>
+```
+
+**Counter animation:**
+```html
+<div data-animation='counter'
+     data-from='0' data-to='7500'
+     data-easing='easeOut'>0</div>
+```
+
+**coverPan without script:**
+```html
+<img src='image:bg_landscape' data-animation='coverPan'
+     data-axis='x' data-from='20' data-to='80'
+     data-zoom='1.2' data-container='#outer' />
+```
+
+### Notes
+
+- When both `data-animation` attributes and a `script` field exist, script takes priority
+- No `script` field needed when using data attributes — the beat only needs `html` and `animation`
+- Values use comma-separated pairs: `data-opacity='0,1'` means from 0 to 1
+
 ### Tips
 
 - **Image prompt quality**: Write detailed, cinematic prompts. Include lighting, angle, mood. The image is the visual foundation.
 - **Darken for readability**: Use `filter:brightness(0.4)` on `<img>` or gradient overlays to ensure text is readable over AI images.
 - **One image per beat**: Each beat typically needs one background image. Define multiple keys in `imageParams.images` for multi-beat scripts.
 - **Mix with slides**: Animated imagePrompt beats can be mixed freely with static `slide` beats in the same script. Use animation for hook/close beats and slides for data-heavy beats.
+- **coverZoom/coverPan vs animate**: For background images, prefer `coverZoom`/`coverPan` over `animate('#wrap', { scale: ... })` — they handle aspect ratios correctly and prevent black borders.
+- **Per-image canvasSize**: Generate landscape images (`canvasSize: { width: 1920, height: 1080 }`) for horizontal pan effects in portrait videos.
