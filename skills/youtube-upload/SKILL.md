@@ -79,9 +79,13 @@ For Shorts, automatically add `#Shorts` to the title if not already present.
 
 ### Publishing schedule (auto-scheduling)
 
+**[MUST]** Always run `date` to check current JST time before scheduling. Past times cause errors or unintended immediate publication.
+
 The upload script automatically handles scheduling based on JST time:
-- **Morning window**: JST 7:00-9:00
-- **Afternoon window**: JST 15:00-17:00
+- **1st priority: Night window**: JST **23:00** — 朝スクロール（6-8時）のレコメンド枠に乗りやすく、views/h が最高。競合も少ない
+- **2nd priority: Morning window**: JST **7:00** — 通勤スクロール層に直接リーチ
+- **3rd priority: Lunch window**: JST **13:00** — 昼休みスクロール層
+- **[MUST] 10:00 は避ける** — 朝スクロール終了後・昼前の谷間。実績データで最低パフォーマンス（損保ジャパン 52 views / 49h）
 - If current JST time is **within** a window → publish immediately as public
 - If current JST time is **outside** windows → schedule for the next available window (uploaded as private with `publishAt`)
 - This is handled automatically by `yt-upload.mjs` — no manual scheduling needed when `--privacy public` is used
@@ -89,6 +93,7 @@ The upload script automatically handles scheduling based on JST time:
 ### Publishing pace
 
 - **[SHOULD]** Limit to **2-3 uploads per day** for optimal algorithm treatment. Bulk uploading (10+ in one day) can hurt channel evaluation.
+- **[MUST]** Minimum **2-hour interval** between posts. 5本以上で自食い、7本以上でスパム判定リスク
 
 ### Step 4: Upload
 
