@@ -25,6 +25,7 @@ When invoking a child skill, try the **namespaced name first**, then fall back t
 2. Try `mulmocast:narrate` → if not found, try `narrate`
 3. Try `mulmocast:extend` → if not found, try `extend`
 4. Try `mulmocast:illustrate` → if not found, try `illustrate`
+5. Try `mulmocast:presentation` → if not found, try `presentation`
 
 This ensures the dispatcher works both as an installed plugin (namespaced) and in local/symlinked setups (no namespace).
 
@@ -44,9 +45,15 @@ Detect the input type and invoke the corresponding skill using the Skill tool:
    - The extend skill will add metadata to the existing MulmoScript
 
 4. **Plain text** (no extension, not a URL)
+   - If the input contains presentation keywords (see below) → invoke `presentation` skill
    - If the input contains illustration keywords (see below) → invoke `illustrate` skill
    - Otherwise → invoke `story` skill
    - Treat as a topic description for the selected skill to research and create a presentation
+
+### Presentation keywords
+
+Route to the `presentation` skill when the input contains any of these keywords:
+`presentation`, `プレゼン`, `プレゼンテーション`, `発表`, `スライド作成`, `slide deck`
 
 ### Illustration keywords
 
