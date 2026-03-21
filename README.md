@@ -76,6 +76,45 @@ Add metadata to an existing MulmoScript to create an ExtendedMulmoScript. The me
 /mulmocast:extend scripts/my-talk/my-talk.json --source samples/my-talk.pdf
 ```
 
+### `/mulmocast:presentation`
+
+Create presentation slides interactively through a hearing → preview → feedback loop. Builds html_tailwind-based rich slides with animation.
+
+1. **Hearing** — Gather theme, audience, goals, duration, tone
+2. **Section-by-section creation** — Build slides per section, preview with `mulmocast movie`, iterate on feedback
+3. **Assembly** — Integrate all sections, select theme/BGM, final quality check
+
+**Usage:**
+```
+/mulmocast:presentation MulmoCastの20分プレゼン
+/mulmocast:presentation AI trends, 10 minutes, for engineers
+```
+
+### `/mulmocast:news-shorts`
+
+Create YouTube Shorts news videos — 2-3 beats, 18-50 seconds, portrait format with imagePrompt + html_tailwind animation.
+
+**Usage:**
+```
+/mulmocast:news-shorts https://example.com/breaking-news
+```
+
+### `/mulmocast:fact-shorts`
+
+Create "Did you know?" YouTube Shorts — 2-beat loop structure (12-18 seconds).
+
+### `/mulmocast:explainer-shorts`
+
+Create "What is ___?" explainer YouTube Shorts — 3-beat structure (15-25 seconds).
+
+### `/mulmocast:ranking-shorts`
+
+Create "Top 3" countdown YouTube Shorts — 3-beat ranking format (18-25 seconds).
+
+### `/mulmocast:versus-shorts`
+
+Create "X vs Y" comparison YouTube Shorts — 3-beat split-screen format (18-25 seconds).
+
 ### `/mulmocast:youtube-upload`
 
 Upload a video file to YouTube. Automatically detects Shorts-eligible videos (vertical, ≤60s) and adds `#Shorts` tag.
@@ -124,14 +163,15 @@ Create a stroke order animation video using KanjiVG data. Supports hiragana, kat
 
 ## References
 
-The `references/` directory contains design guides for the `/mulmocast:story` skill:
+The `references/` directory contains design guides for the `/mulmocast:story` and `/mulmocast:presentation` skills:
 
 | Reference | Description |
 |-----------|-------------|
 | `slide_dsl_reference.md` | Slide DSL layout and block specifications |
 | `slide_patterns.md` | Design pattern examples (dense slides, charts, mermaid) |
 | `html_animation_reference.md` | MulmoAnimation DSL API reference |
-| `cinematic_patterns.md` | Cinematic theme recipes — 14 themes: Space Opera, Cyberpunk, Mecha Anime, Film Noir, Retro Synthwave, Matrix, Documentary, Anime Opening, Horror, Terminator T-800, Dragon Ball Scouter, Blade Runner, Total Recall, Iron Man JARVIS. Includes external BGM URLs (Mixkit, Incompetech) |
+| `cinematic_patterns.md` | Cinematic theme recipes — 14 themes with BGM URLs |
+| `image_prompt_reference.md` | Image prompt writing guide and Visual Brief template |
 
 ## Installation
 
