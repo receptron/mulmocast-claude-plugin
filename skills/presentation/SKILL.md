@@ -11,6 +11,8 @@ user-invocable: true
 
 **原則**: ナレーション（何を言うか）とビジュアル（どう見せるか）を分離。一度に全部作らず、セクション単位で段階的に組み立てる。
 
+**鉄則**: テンプレだけのスライドは禁止。データは必ずグラフ化し、概念は必ず画像で可視化する。
+
 ---
 
 ## Phase 1: ヒアリング
@@ -290,9 +292,42 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
 "animation": { "movie": true }
 ```
 
+#### ビジュアルの鉄則 — テンプレだけのスライドは禁止
+
+プレゼンテーションの鉄則として、以下を必ず守る：
+
+1. **データは必ずグラフ化** — 数値を箇条書きで並べるだけは禁止。Chart.js の `chart` ブロックを使う
+   - **比較**: 棒グラフ（bar）、横棒（horizontalBar）
+   - **構成比**: 円グラフ（pie）、ドーナツ（doughnut）
+   - **推移**: 折れ線（line）、面（area）
+   - **フロー・構造**: Sankey チャート（`chartjs-chart-sankey`、自動ロード）
+   - **階層・構成**: Treemap（`chartjs-chart-treemap`、自動ロード）
+   - **増減分析**: Waterfall レイアウト
+   - **関係性**: Mermaid 図
+
+2. **概念・対象物は必ず画像で可視化**
+   - **実在する対象**（人物、企業、製品）: WebFetch/curl で実画像をダウンロードし `output/images/{basename}/` に保存
+   - **抽象概念**: `imageParams.images` に `imagePrompt` で AI 生成画像を定義し、`image:keyName` で参照
+   - **全スライドの半数以上** に画像を入れることを目指す
+
+3. **テキストだけのスライドは2枚以上連続させない**
+   - テキストスライドの前後には必ずビジュアルスライド（グラフ、画像、図解）を挟む
+
+#### グラフ使い分けガイド
+
+| データの特性 | 推奨グラフ | 例 |
+|------------|----------|---|
+| A vs B の比較 | bar | 売上前年比較 |
+| 全体の内訳 | pie / doughnut | セグメント構成比 |
+| 時系列推移 | line | 四半期業績推移 |
+| 資金・リソースの流れ | sankey | 投資先配分、売上構成フロー |
+| 階層的な構成 | treemap | ポートフォリオ構成 |
+| 増減の要因分析 | waterfall | 利益増減要因 |
+| プロセス・関係性 | mermaid | 組織図、フロー図 |
+
 #### html_tailwind + slide の混在
 
-必要に応じて、構造化データが多いスライド（テーブル、チャート、Mermaid図）は `type: "slide"` の Slide DSL を使ってもよい。その場合は `slideParams.theme` を設定すること。
+グラフやテーブルを含むスライドは `type: "slide"` の Slide DSL を使う。ビジュアル重視のスライドは `type: "html_tailwind"` を使う。両者を自由に混在できる。`slideParams.theme` を設定すること。
 
 ### プレビュー生成
 
