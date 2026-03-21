@@ -264,7 +264,7 @@ Use `image:` URL scheme — no file paths needed:
         "animation.animate('#wrap', { scale: [1.0, 1.15] }, { start: 0, end: 'auto', easing: 'linear' });",
         "animation.animate('#text', { opacity: [0,1], translateY: [40,0] }, { start: 0.5, end: 1.5, easing: 'easeOut' });"
       ],
-      "animation": true
+      "animation": { "movie": true }
     }
   }]
 }
@@ -283,7 +283,7 @@ Tips: Use `filter:brightness(0.4)` or gradient overlays for text readability. Mi
       "const animation = new MulmoAnimation();",
       "animation.animate('#el', { opacity: [0, 1], translateY: [30, 0] }, { start: 0, end: 0.5, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -293,6 +293,7 @@ Key rules:
 - `script`: JavaScript code (no `<script>` tags). Use `MulmoAnimation` DSL or raw `render()` + `interpolate()`
 - `animation`: `true` (30fps) or `{ "fps": 15 }` for custom fps
 - **Do NOT set `duration`** — it is auto-calculated from the audio length. Setting it explicitly causes audio/video desync. Only set `duration` for silent beats or fixed-length intros.
+- **MUST use `"animation": { "movie": true }`** — never use `"animation": true`. Movie mode uses CDP screencast which is ~7-8x faster than frame-by-frame rendering.
 - Name the MulmoAnimation instance `animation` to enable auto-render (no manual `render()` needed)
 - Use `end: 'auto'` for animations that span the entire beat duration
 
