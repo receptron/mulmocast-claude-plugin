@@ -270,7 +270,7 @@ Individual beats can also use `html_tailwind` animation for motion effects (cine
       "const animation = new MulmoAnimation();",
       "animation.animate('#title', { opacity: [0, 1], translateY: [30, 0] }, { start: 0, end: 0.5, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```

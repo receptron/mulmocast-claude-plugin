@@ -119,7 +119,7 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
       "const animation = new MulmoAnimation();",
       "animation.animate('#content', { opacity: [0,1], translateY: [40,0] }, { start: 0.3, end: 1.2, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -148,7 +148,7 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
       "animation.animate('#heading', { opacity: [0,1], translateX: [30,0] }, { start: 0.5, end: 1.2, easing: 'easeOut' });",
       "animation.animate('#body', { opacity: [0,1], translateX: [30,0] }, { start: 0.8, end: 1.5, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -180,7 +180,7 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
       "animation.animate('#title', { opacity: [0,1], translateY: [20,0] }, { start: 0.2, end: 0.8, easing: 'easeOut' });",
       "animation.stagger('#item', 3, { opacity: [0,1], translateX: [40,0] }, { start: 0.6, stagger: 0.4, duration: 0.5, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -214,7 +214,7 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
       "animation.counter('#num2', [0, 2400], { start: 0.5, end: 1.7, suffix: '万', easing: 'easeOut' });",
       "animation.counter('#num3', [0, 98], { start: 0.7, end: 1.9, suffix: '件', easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -237,7 +237,7 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
       "const animation = new MulmoAnimation();",
       "animation.animate('#quote', { opacity: [0,1], scale: [0.9,1.0] }, { start: 0.3, end: 1.2, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -264,7 +264,7 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
       "animation.coverZoom('#wrap img', { zoomFrom: 1.0, zoomTo: 1.12, start: 0, end: 'auto', containerSelector: '#wrap' });",
       "animation.animate('#overlay', { opacity: [0,1], translateY: [30,0] }, { start: 0.8, end: 1.5, easing: 'easeOut' });"
     ],
-    "animation": true
+    "animation": { "movie": true }
   }
 }
 ```
@@ -281,6 +281,14 @@ curl -fL -o output/images/{scriptBasename}/{name}.jpg "URL"
 | 写真・イメージ重視 | 画像フルスクリーン + オーバーレイ |
 | 比較・対比 | 左右分割（カスタム） |
 | フロー・プロセス | ステップ表示（stagger アニメ） |
+
+#### animation は必ず movie モードを使う
+
+`"animation": true` ではなく `"animation": { "movie": true }` を必ず指定する。movie モードはCDP screencastを使い、フレーム単位のレンダリングより大幅に高速（約7-8倍）。
+
+```json
+"animation": { "movie": true }
+```
 
 #### html_tailwind + slide の混在
 
