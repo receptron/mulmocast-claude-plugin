@@ -173,6 +173,10 @@ The `references/` directory contains design guides for the `/mulmocast:story` an
 | `cinematic_patterns.md` | Cinematic theme recipes — 14 themes with BGM URLs |
 | `image_prompt_reference.md` | Image prompt writing guide and Visual Brief template |
 
+## Repository Structure
+
+This repo is both a **Claude Code Plugin** and a local development workspace. See [docs/plugin-structure.md](./docs/plugin-structure.md) for details on the dual-mode setup (Plugin distribution + local `.claude/skills` symlink).
+
 ## Installation
 
 ### Step 1: Add marketplace
