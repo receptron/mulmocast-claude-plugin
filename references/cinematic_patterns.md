@@ -1,5 +1,7 @@
 # Cinematic Animation Patterns
 
+> Related (X research, 2026-09): Claude Opus 5.5 code-rendered video patterns — see [`x-opus55-code-video-patterns-2026-09.md`](./x-opus55-code-video-patterns-2026-09.md).
+
 Theme-specific recipes for creating cinematic `html_tailwind` animated presentations. Each theme includes visual identity, beat patterns with complete code examples, and BGM recommendations.
 
 For the animation API reference (MulmoAnimation DSL, interpolate, Easing), see `references/html_animation_reference.md`.
