@@ -65,6 +65,63 @@ Mulmo の語り口は別価値で: **台本駆動・TTS・多言語・配信ま�
 | G 技法モンタージュ | 同一 text を image/html_tailwind/chart 等で畳む |
 | E 分業クレジット | エンドカードで pipeline（script / TTS / BGM）を明示 |
 
+
+
+## YouTube Shorts への適用
+
+結論: **型の多くは Shorts 向き。ただし尺・縦・冒頭3秒の制約で切り直す。**  
+MulmoCast には既に Shorts スキル群がある（いずれも 1080×1920、`html_tailwind` + `imagePrompt`）:
+
+| スキル | 尺 | ビート | Shorts での役割 |
+|--------|----|--------|-----------------|
+| `fact-shorts` | 12–18s | 2 | 衝撃1事実＋ループ |
+| `explainer-shorts` | 15–25s | 3 | 「○○って何？」図解 |
+| `ranking-shorts` | 18–25s | 3 | Top3 カウントダウン |
+| `news-shorts` | ≤50s | 2–3 | 速報→意味 |
+| `versus-shorts` | 18–25s | 3 | 左右比較＋判定 |
+
+### X 側で見えた Shorts 接続（2026-09-22〜25）
+
+- Opus 5.5 のコード映像を **Shorts / Reels / TikTok 向け**と明言する投稿が各国で出ている（純コードの映画的シーン、JS 一発での Shorts リミックス、ループするプロモ物語、ポッドキャスト→Shorts 切り出し＋アニメ）。
+- 「情報密度の高い10秒映像」が Shorts 平台と同型のドーパミン、というメタ発言あり。
+- 制作支援: 長尺→Shorts 切り出しの A/B（Opus vs 他モデル）、HyperFrames 製品プロモ、純 JS 単発リメイク。
+
+### パターン × Shorts 対応表
+
+| ID | Shorts 適合 | Mulmo での落とし方 | 注意 |
+|----|-------------|-------------------|------|
+| A 単一HTML長尺 | △ | 78s 級は **本編ではなく**、冒頭3–15s を teaser Short に切る／または横長デモのまま | 縦9:16・60s超は Shorts 不利 |
+| B 同プロンプト比較 | ◎ | `versus-shorts` のスプリット、または2本シリーズ | 1本に詰めすぎない |
+| C Blender コード駆動 | △ | 見せ場1ショットだけ Short 化 | 制作過程丸ごとは長尺向き |
+| D Remotion 長尺 | ×〜△ | ハイライト15–25s のみ | 映画全体は Shorts に載せない |
+| E 教材/PV/分業 | ◎ | `explainer-shorts` / 製品 Short + エンドカードで pipeline | クレジットは末尾 |
+| F 落差フック | ◎◎ | `fact-shorts` / teaser。**最も Shorts 相性が良い** | 1–3秒でフック |
+| G 技法モンタージュ | ◎ | `ranking-shorts` 的な畳み、または explainer の図解切替 | 切替は0.5–1.5s単位 |
+
+### Shorts 向け Do / Don't（Mulmo）
+
+**Do**
+
+1. 最初の1–3秒で数字・対立・落差・問いを画面に出す（音声オフ前提）。
+2. 12–25秒を既定にし、`fact` / `explainer` / `versus` / `ranking` の既存スキルに乗せる。
+3. Opus 波の「1成果物の驚き」は **1 MulmoScript → 縦動画1本** のデモとして Shorts 化する。
+4. A/B 比較は versus 1本、または Part1/Part2 の連続 Shorts。
+5. ループ狙いなら `fact-shorts` の2ビート構造を優先。
+
+**Don't**
+
+1. 78秒 HTML 映画や3分 Remotion をそのまま Shorts に上げる。
+2. 横長シネマティックをレターボックスだけで縦に誤魔化す（主要情報を中央1/3に再レイアウト）。
+3. X の個別作品ビジュアル・IP・BGM をコピーする。
+4. Shorts で「コード数千行」「MCP で Blender」を主語にしすぎる（Mulmo の主語は台本→完成動画）。
+
+### Mulmo Shorts のすぐ使える打ち手
+
+1. **落差 teaser**（F）: 盛り上げ → 一瞬で反転。15s。`fact-shorts` 近傍。
+2. **モデル/スタイル比較**（B）: 同一台本・voice/style だけ変えた versus。
+3. **1事実ループ**（Aの驚きを短尺化）: 「MulmoScript 1本でここまで」を12–18s。
+4. **技法畳み**（G）: 同一テキストを image → html_tailwind → chart で3切替（ranking/explainer）。
+
 ## 更新ルール
 
 - バズ個別の追記は月次で別ファイルに分けるか、本ファイル末尾に日付セクションを足す。
